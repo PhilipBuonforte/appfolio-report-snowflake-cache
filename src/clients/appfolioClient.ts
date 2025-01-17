@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const BASE_URL = process.env.APPFOLIO_BASE_URL!;
 const CLIENT_ID = process.env.APPFOLIO_CLIENT_ID!;
 const CLIENT_SECRET = process.env.APPFOLIO_CLIENT_SECRET!;
 const DATABASE_ID = process.env.APPFOLIO_DATABASE_ID!;
@@ -15,7 +14,8 @@ const DATABASE_ID = process.env.APPFOLIO_DATABASE_ID!;
  */
 export async function fetchAppFolioData(
   endpoint: string,
-  params: Record<string, string | number | boolean> = {}
+  params: Record<string, string | number | boolean> = {},
+  paginated: boolean = false
 ): Promise<any[]> {
   try {
     const url = `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v1/reports/${endpoint}.json`;
@@ -24,7 +24,7 @@ export async function fetchAppFolioData(
       params,
     });
 
-    return response.data;
+    return response.data.results;
   } catch (error: any) {
     console.error("Error fetching data from AppFolio:", error.message);
     throw error;

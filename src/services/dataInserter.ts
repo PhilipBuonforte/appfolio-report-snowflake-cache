@@ -1,5 +1,5 @@
 import { Bind } from "snowflake-sdk";
-import { connection } from "./snowflakeClient";
+import { connection } from "../clients/snowflakeClient";
 
 /**
  * Inserts data into a Snowflake table in batches.
@@ -47,9 +47,7 @@ export async function insertDataToSnowflake(
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
 
-      const values = batch
-        .map(() => placeholders)
-        .join(", "); // Combine placeholders for the batch
+      const values = batch.map(() => placeholders).join(", "); // Combine placeholders for the batch
 
       const insertSQL = `INSERT INTO ${tableName} (${keys.join(
         ", "
