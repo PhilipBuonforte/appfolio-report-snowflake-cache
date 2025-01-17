@@ -9,10 +9,10 @@ async function main() {
     await connectToSnowflake();
 
     // Fetch data from AppFolio API
-    const endpoint = "general_ledger"; // Replace with your desired endpoint
+    const endpoint = "income_statement"; // Replace with your desired endpoint
     const params = {
       paginate_results: false,
-      from_date: "2025-01-01",
+      from_date: "2010-01-01",
       to_date: "2025-01-02",
     };
 
@@ -22,7 +22,7 @@ async function main() {
     const transformedData = transformData(rawData);
 
     // Insert data into Snowflake
-    await insertDataToSnowflake(transformedData, "appfolio_general_ledger");
+    await insertDataToSnowflake(transformedData, "appfolio_income_statement");
 
     console.log("Pipeline completed successfully.");
   } catch (error) {
