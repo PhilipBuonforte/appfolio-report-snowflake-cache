@@ -1,5 +1,6 @@
 import { Bind } from "snowflake-sdk";
 import { connection } from "../clients/snowflakeClient";
+import logger from "../utils/logger"; // Import Winston logger
 
 /**
  * Inserts data into a Snowflake table in batches.
@@ -13,7 +14,7 @@ export async function insertDataToSnowflake(
   batchSize: number = 5000 // Default batch size
 ): Promise<void> {
   if (data.length === 0) {
-    console.log("No data to insert.");
+    logger.info("[INFO] No data to insert.");
     return;
   }
 
@@ -29,14 +30,23 @@ export async function insertDataToSnowflake(
   `;
 
   try {
+    logger.info(`[INFO] Ensuring table '${tableName}' exists.`);
+    logger.debug(`[DEBUG] Executing SQL: ${createTableSQL}`);
+
     // Ensure the table exists
     await new Promise<void>((resolve, reject) => {
       connection.execute({
         sqlText: createTableSQL,
         complete: (err) => {
           if (err) {
+            logger.error(
+              `[ERROR] Failed to create or verify table: ${err.message}`
+            );
             reject(err);
           } else {
+            logger.info(
+              `[INFO] Table '${tableName}' checked/created successfully.`
+            );
             resolve();
           }
         },
@@ -48,7 +58,6 @@ export async function insertDataToSnowflake(
       const batch = data.slice(i, i + batchSize);
 
       const values = batch.map(() => placeholders).join(", "); // Combine placeholders for the batch
-
       const insertSQL = `INSERT INTO ${tableName} (${keys.join(
         ", "
       )}) VALUES ${values}`;
@@ -57,26 +66,43 @@ export async function insertDataToSnowflake(
         Object.values(item)
       ) as Bind[]; // Flatten the batch into a single array of binds
 
+      logger.info(
+        `[INFO] Inserting batch ${Math.ceil((i + 1) / batchSize)} (Rows: ${
+          batch.length
+        })...`
+      );
+      logger.debug(`[DEBUG] Executing SQL: ${insertSQL}`);
+      logger.debug(`[DEBUG] Binds: ${JSON.stringify(binds.slice(0, 10))}...`);
+
       await new Promise<void>((resolve, reject) => {
         connection.execute({
           sqlText: insertSQL,
           binds,
           complete: (err) => {
             if (err) {
+              logger.error(`[ERROR] Failed to insert batch: ${err.message}`);
               reject(err);
             } else {
+              logger.info(
+                `[INFO] Batch inserted successfully: Rows ${i + 1} to ${
+                  i + batch.length
+                }.`
+              );
               resolve();
             }
           },
         });
       });
-
-      console.log(`Batch inserted: ${i + 1}-${i + batch.length}`);
     }
 
-    console.log("All data inserted successfully.");
-  } catch (error) {
-    console.error("Error inserting data into Snowflake:", error);
+    logger.info("[INFO] All data inserted successfully.");
+  } catch (error: any) {
+    logger.error(
+      `[ERROR] Error inserting data into Snowflake: ${error.message}`,
+      {
+        stack: error.stack,
+      }
+    );
     throw error;
   }
 }

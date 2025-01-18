@@ -7,3 +7,7 @@ snowflake.log
 /temp
 
 */*.log
+/dist
+
+dist
+/logs

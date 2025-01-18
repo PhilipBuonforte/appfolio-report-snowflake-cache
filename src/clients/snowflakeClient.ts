@@ -1,5 +1,6 @@
 import snowflake from "snowflake-sdk";
 import { SnowflakeConfig } from "../config/snowflake";
+import logger from "../utils/logger"; // Import the Winston logger
 
 const connection = snowflake.createConnection({
   account: SnowflakeConfig.account,
@@ -11,17 +12,22 @@ const connection = snowflake.createConnection({
   role: SnowflakeConfig.role,
 });
 
+/**
+ * Establish a connection to Snowflake using Promises for asynchronous handling.
+ * Logs the connection status using Winston.
+ */
 export function connectToSnowflake(): Promise<void> {
   return new Promise((resolve, reject) => {
     connection.connect((err, conn) => {
       if (err) {
-        reject(`Failed to connect to Snowflake: ${err.message}`);
+        logger.error(`[ERROR] Failed to connect to Snowflake: ${err.message}`);
+        reject(err);
       } else {
-        console.log("Connected to Snowflake.");
         resolve();
       }
     });
   });
 }
 
+// Export the Snowflake connection object
 export { connection };

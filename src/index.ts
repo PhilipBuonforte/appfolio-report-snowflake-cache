@@ -2,24 +2,52 @@ import { connectToSnowflake } from "./clients/snowflakeClient";
 import AppFolioReports from "./const/appfolio";
 import { SnowFlakeInsertingMethod } from "./const/enum";
 import { handleAppFolioData } from "./services/appfolioService";
+import logger from "./utils/logger"; // Import Winston logger
 
 async function main() {
-  await connectToSnowflake();
+  try {
+    logger.info("[INFO] Starting the AppFolio data pipeline...");
 
-  const endpoint = AppFolioReports.BudgetDetail;
-  const tableName = `appfolio_${AppFolioReports.BudgetDetail}`;
-  const paginated = true; // Fetch paginated results
-  const insertMethod: SnowFlakeInsertingMethod =
-    SnowFlakeInsertingMethod.BulkInsert;
-  const batchSize = 1000; // Batch size for batch inserts
+    // Connect to Snowflake
+    logger.info("[INFO] Connecting to Snowflake...");
+    await connectToSnowflake();
+    logger.info("[INFO] Successfully connected to Snowflake.");
 
-  await handleAppFolioData(
-    endpoint,
-    tableName,
-    paginated,
-    insertMethod,
-    batchSize
-  );
+    // Configuration
+    const endpoint = AppFolioReports.TenantTickler;
+    const tableName = `appfolio_${AppFolioReports.TenantTickler}`;
+    const paginated = true; // Fetch paginated results
+    const insertMethod: SnowFlakeInsertingMethod =
+      SnowFlakeInsertingMethod.BulkInsert;
+    const batchSize = 1000; // Batch size for batch inserts
+
+    logger.info(`[INFO] Configured endpoint: ${endpoint}`);
+    logger.info(`[INFO] Target table: ${tableName}`);
+    logger.info(`[INFO] Insert method: ${insertMethod}`);
+    logger.info(`[INFO] Batch size: ${batchSize}`);
+    logger.info(`[INFO] Paginated fetch: ${paginated}`);
+
+    // Handle AppFolio data
+    logger.info("[INFO] Fetching and inserting AppFolio data...");
+    await handleAppFolioData(
+      endpoint,
+      tableName,
+      paginated,
+      insertMethod,
+      batchSize
+    );
+    logger.info("[INFO] AppFolio data pipeline completed successfully.");
+  } catch (err: any) {
+    logger.error(`[ERROR] Pipeline failed: ${err.message}`, {
+      stack: err.stack,
+    });
+    throw err; // Re-throw the error to allow external monitoring systems to capture it
+  }
 }
 
-main().catch((err) => console.error("Pipeline failed:", err));
+// Start the pipeline
+main().catch((err) => {
+  logger.error("[CRITICAL] Unhandled exception in main pipeline.", {
+    error: err,
+  });
+});
