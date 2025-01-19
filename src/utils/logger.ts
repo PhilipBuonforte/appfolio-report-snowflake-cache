@@ -18,11 +18,7 @@ const logger = createLogger({
   transports: [
     // Console logging
     new transports.Console({
-      format: format.combine(
-        format.colorize(),
-        format.timestamp(),
-        customFormat
-      ),
+      format: format.combine(format.timestamp(), customFormat),
     }),
     // Daily rotating file for general logs
     new transports.DailyRotateFile({

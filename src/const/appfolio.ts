@@ -4,6 +4,7 @@ const AppFolioReports = {
   BudgetDetail: "property_budget",
   IncomeStatement: "income_statement",
   TenantTickler: "tenant_tickler",
+  UnitVacancy: "unit_vacancy",
 };
 
 export default AppFolioReports;

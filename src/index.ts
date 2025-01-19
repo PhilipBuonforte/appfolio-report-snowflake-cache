@@ -14,8 +14,8 @@ async function main() {
     logger.info("[INFO] Successfully connected to Snowflake.");
 
     // Configuration
-    const endpoint = AppFolioReports.TenantTickler;
-    const tableName = `appfolio_${AppFolioReports.TenantTickler}`;
+    const endpoint = AppFolioReports.UnitVacancy;
+    const tableName = `appfolio_${AppFolioReports.UnitVacancy}`;
     const paginated = true; // Fetch paginated results
     const insertMethod: SnowFlakeInsertingMethod =
       SnowFlakeInsertingMethod.BulkInsert;
