@@ -16,13 +16,24 @@ export async function fetchAppFolioData(
   endpoint: string,
   params: Record<string, string | number | boolean> = {},
   paginated: boolean = false
-): Promise<any[]> {
+): Promise<any> {
   try {
-    const url = `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v1/reports/${endpoint}.json`;
+    const url = paginated
+      ? endpoint
+      : `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v1/reports/${endpoint}.json`;
+
     const response = await axios.get(url, {
       params,
     });
-    return response.data.results;
+
+    if (response.data.results) {
+      return {
+        results: response.data.results,
+        next_page_url: response.data.next_page_url,
+      };
+    } else {
+      return { results: response.data, next_page_url: null };
+    }
   } catch (error: any) {
     console.error("Error fetching data from AppFolio:", error.message);
     throw error;

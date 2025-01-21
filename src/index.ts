@@ -14,12 +14,13 @@ async function main() {
     logger.info("[INFO] Successfully connected to Snowflake.");
 
     // Configuration
-    const endpoint = AppFolioReports.UnitVacancy;
-    const tableName = `appfolio_${AppFolioReports.UnitVacancy}`;
+    const endpoint = AppFolioReports.TenantTickler.name;
+    const tableName = `appfolio_${AppFolioReports.TenantTickler.name}`;
+    const params = AppFolioReports.TenantTickler.params;
     const paginated = true; // Fetch paginated results
     const insertMethod: SnowFlakeInsertingMethod =
       SnowFlakeInsertingMethod.BulkInsert;
-    const batchSize = 1000; // Batch size for batch inserts
+    const batchSize = 50000; // Batch size for batch inserts
 
     logger.info(`[INFO] Configured endpoint: ${endpoint}`);
     logger.info(`[INFO] Target table: ${tableName}`);
@@ -34,7 +35,8 @@ async function main() {
       tableName,
       paginated,
       insertMethod,
-      batchSize
+      batchSize,
+      params
     );
     logger.info("[INFO] AppFolio data pipeline completed successfully.");
   } catch (err: any) {

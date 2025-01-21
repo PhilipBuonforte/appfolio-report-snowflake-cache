@@ -68,11 +68,7 @@ export async function bulkInsert(
 
   // Snowflake commands
   const stageName = `@%${tableName}`;
-  const createTableSQL = `
-    CREATE TABLE IF NOT EXISTS ${tableName} (
-      ${keys.map((key) => `${key} STRING`).join(", ")}
-    );
-  `;
+
   const putSQL = `PUT 'file://${normalizedCsvFilePath}' ${stageName}`;
   const copySQL = `
     COPY INTO ${tableName}
@@ -86,16 +82,6 @@ export async function bulkInsert(
   `;
 
   try {
-    logger.info("[INFO] Ensuring table exists...");
-    logger.debug(`[DEBUG] Executing SQL: ${createTableSQL}`);
-    await new Promise<void>((resolve, reject) => {
-      connection.execute({
-        sqlText: createTableSQL,
-        complete: (err) => (err ? reject(err) : resolve()),
-      });
-    });
-    logger.info(`[INFO] Table '${tableName}' checked/created successfully.`);
-
     logger.info("[INFO] Uploading CSV file to Snowflake stage...");
     logger.debug(`[DEBUG] Executing SQL: ${putSQL}`);
     await new Promise<void>((resolve, reject) => {
