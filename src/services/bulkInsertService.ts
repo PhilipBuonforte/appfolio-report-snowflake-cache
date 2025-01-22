@@ -30,7 +30,8 @@ export async function bulkInsert(
   }
 
   const keys = Object.keys(data[0]); // Column names
-  const csvFilePath = path.resolve(__dirname, `../../temp/${tableName}.csv`);
+  const uniqueFileName = `${tableName}_${Date.now()}.csv`;
+  const csvFilePath = path.resolve(__dirname, `../../temp/${uniqueFileName}`);
   const normalizedCsvFilePath = csvFilePath.replace(/\\/g, "/"); // Normalize path for Windows
 
   logger.info(`[INFO] Preparing bulk insert for table: ${tableName}`);
@@ -93,7 +94,7 @@ export async function bulkInsert(
             reject(err);
           } else {
             logger.info(
-              `[INFO] CSV uploaded successfully. Rows affected: ${rows}`
+              `[INFO] CSV uploaded successfully. Rows affected: ${rows?.length}`
             );
             resolve();
           }
@@ -112,7 +113,7 @@ export async function bulkInsert(
             reject(err);
           } else {
             logger.info(
-              `[INFO] Data loaded successfully. Rows affected: ${rows}`
+              `[INFO] Data loaded successfully. Rows affected: ${rows?.length}`
             );
             resolve();
           }
@@ -124,5 +125,19 @@ export async function bulkInsert(
   } catch (error) {
     logger.error("[ERROR] Bulk insert failed:", error);
     throw error;
+  } finally {
+    try {
+      if (fs.existsSync(csvFilePath)) {
+        fs.unlinkSync(csvFilePath);
+        logger.info(
+          `[INFO] Temporary file '${csvFilePath}' deleted successfully.`
+        );
+      }
+    } catch (err) {
+      logger.error(
+        `[ERROR] Failed to delete temporary file '${csvFilePath}':`,
+        err
+      );
+    }
   }
 }

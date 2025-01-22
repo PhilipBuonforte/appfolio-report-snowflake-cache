@@ -4,6 +4,7 @@ import { batchInsert } from "./batchInsertService";
 import { bulkInsert } from "./bulkInsertService";
 import { transformData } from "./dataTransformer";
 import { dropTable, ensureTableExists, renameTable } from "./snowflakeService";
+import logger from "../utils/logger";
 
 export async function handleAppFolioData(
   endpoint: string,
@@ -16,45 +17,99 @@ export async function handleAppFolioData(
   const stagingTableName = `${tableName}_staging`; // Define the staging table name
   let nextPageUrl: string | null = null;
 
-  // Ensure the staging table exists
-  let isFirstBatch = true; // To track the first batch for table creation
-  do {
-    // Fetch data from AppFolio API
-    const { results, next_page_url } = await fetchAppFolioData(
-      nextPageUrl || endpoint,
-      params,
-      !isFirstBatch
+  logger.info(`[INFO] Starting data handling for table '${tableName}'.`);
+  logger.info(
+    `[INFO] Endpoint: ${endpoint}, Paginated: ${paginated}, Insert Method: ${insertMethod}, Batch Size: ${batchSize}`
+  );
+
+  try {
+    // Ensure the staging table exists
+    let isFirstBatch = true; // To track the first batch for table creation
+
+    await dropTable(stagingTableName);
+
+    do {
+      logger.info(
+        `[INFO] Fetching data from AppFolio API. Next page URL: ${
+          nextPageUrl || "initial endpoint"
+        }`
+      );
+
+      // Fetch data from AppFolio API
+      const { results, next_page_url } = await fetchAppFolioData(
+        nextPageUrl || endpoint,
+        params,
+        !isFirstBatch
+      );
+
+      logger.info(
+        `[INFO] Fetched ${results.length} records from AppFolio API.`
+      );
+
+      // Transform the data
+      const transformedData = transformData(results);
+      logger.debug(
+        `[DEBUG] Transformed data: ${JSON.stringify(
+          transformedData[0],
+          null,
+          2
+        )} (showing first record)`
+      );
+
+      // Ensure the staging table exists (only for the first batch)
+      if (isFirstBatch) {
+        logger.info(
+          `[INFO] Ensuring staging table '${stagingTableName}' exists...`
+        );
+        await ensureTableExists(
+          stagingTableName,
+          Object.keys(transformedData[0])
+        );
+        logger.info(`[INFO] Staging table '${stagingTableName}' is ready.`);
+        isFirstBatch = false;
+      }
+
+      // Insert data into Snowflake
+      if (insertMethod === SnowFlakeInsertingMethod.BatchInsert) {
+        logger.info(
+          `[INFO] Inserting data into '${stagingTableName}' using Batch Insert.`
+        );
+        await batchInsert(transformedData, stagingTableName, batchSize);
+      } else if (insertMethod === SnowFlakeInsertingMethod.BulkInsert) {
+        logger.info(
+          `[INFO] Inserting data into '${stagingTableName}' using Bulk Insert.`
+        );
+        await bulkInsert(transformedData, stagingTableName);
+      }
+      logger.info(
+        `[INFO] Data inserted into staging table '${stagingTableName}' successfully.`
+      );
+
+      // Update the nextPageUrl to continue fetching
+      nextPageUrl = next_page_url;
+    } while (nextPageUrl);
+
+    // Drop the previous table
+    logger.info(`[INFO] Dropping the old table '${tableName}'...`);
+    await dropTable(tableName);
+    logger.info(`[INFO] Old table '${tableName}' dropped successfully.`);
+
+    // Rename the staging table to the original table name
+    logger.info(
+      `[INFO] Renaming staging table '${stagingTableName}' to '${tableName}'...`
+    );
+    await renameTable(stagingTableName, tableName);
+    logger.info(
+      `[INFO] Staging table '${stagingTableName}' renamed to '${tableName}' successfully.`
     );
 
-    console.log("Fetched data:", results);
-    console.log("Next page URL:", next_page_url);
-
-    // Transform the data
-    const transformedData = transformData(results);
-
-    // Ensure the staging table exists (only for the first batch)
-    if (isFirstBatch) {
-      await ensureTableExists(
-        stagingTableName,
-        Object.keys(transformedData[0])
-      );
-      isFirstBatch = false;
-    }
-
-    // Insert data into Snowflake
-    if (insertMethod === SnowFlakeInsertingMethod.BatchInsert) {
-      await batchInsert(transformedData, stagingTableName, batchSize);
-    } else if (insertMethod === SnowFlakeInsertingMethod.BulkInsert) {
-      await bulkInsert(transformedData, stagingTableName);
-    }
-
-    // Update the nextPageUrl to continue fetching
-    nextPageUrl = next_page_url;
-  } while (nextPageUrl);
-
-  // Drop the previous table
-  await dropTable(tableName);
-
-  // Rename the staging table to the original table name
-  await renameTable(stagingTableName, tableName);
+    logger.info(
+      `[INFO] Data handling for table '${tableName}' completed successfully.`
+    );
+  } catch (error: any) {
+    logger.error(
+      `[ERROR] Error occurred while handling data for table '${tableName}': ${error.message}`
+    );
+    throw error; // Re-throw the error for further handling
+  }
 }

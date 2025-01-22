@@ -19,10 +19,10 @@ export async function fetchAppFolioData(
 ): Promise<any> {
   try {
     const url = paginated
-      ? endpoint
-      : `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v1/reports/${endpoint}.json`;
+      ? `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com${endpoint}`
+      : `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v2/reports/${endpoint}.json`;
 
-    const response = await axios.get(url, {
+    const response = await axios.post(url, {
       params,
     });
 
