@@ -26,7 +26,6 @@ const AppFolioReports = {
       period_from: "Jan 2024",
       period_to: "Dec 2025",
       property_visibility: "all",
-      include_zero_balance_gl_accounts: "1",
     },
   },
   // Correct params

@@ -22,9 +22,9 @@ export async function fetchAppFolioData(
       ? `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com${endpoint}`
       : `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v2/reports/${endpoint}.json`;
 
-    const response = await axios.post(url, {
-      params,
-    });
+    const response = paginated
+      ? await axios.post(url, {})
+      : await axios.post(url, params);
 
     if (response.data.results) {
       return {
