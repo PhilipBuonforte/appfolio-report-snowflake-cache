@@ -9,5 +9,6 @@ snowflake.log
 */*.log
 /dist
 
-dist
+dist/*
+
 /logs
