@@ -10,8 +10,8 @@ const AppFolioReports = {
       project_visibility: "all",
       accounting_basis: "accrual",
       posted_on_from: "01/01/2024",
-      posted_on_to: "03/01/2024",
-      // posted_on_to: new Date().toLocaleDateString("en-US"), // Dynamically sets today's date in MM/DD/YYYY format
+      // posted_on_to: "03/01/2024",
+      posted_on_to: new Date().toLocaleDateString("en-US"), // Dynamically sets today's date in MM/DD/YYYY format
     },
   },
   // Correct params
