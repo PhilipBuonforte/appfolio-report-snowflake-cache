@@ -171,11 +171,12 @@ export async function handleAppFolioData(
 
         let pageNumber = 1; // Start from page 1
         let stopLoop = false; // Flag to stop the loop
+        const chunkCount = 15;
 
         // Check if metadata_id is present
         do {
           // Create an array of promises for 10 iterations
-          const promises = Array.from({ length: 10 }, (_, index) => {
+          const promises = Array.from({ length: chunkCount }, (_, index) => {
             const currentPageNumber = pageNumber + index; // Increment page number for each iteration
             return tryFetchData(endpoint, stagingTableName, Number(metadataId), currentPageNumber);
           });
@@ -196,7 +197,7 @@ export async function handleAppFolioData(
           csvFileNames = []
 
           // Increment the page number for the next batch
-          pageNumber += 10;
+          pageNumber += chunkCount;
         } while (!stopLoop);
       }
     } catch (error: any) {

@@ -8,7 +8,7 @@ const customFormat = format.printf(({ level, message, timestamp }) => {
 
 // Create the Winston logger
 const logger = createLogger({
-  level: "debug", // Default logging level
+  level: "info", // Default logging level
   format: format.combine(
     format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
     format.errors({ stack: true }),
