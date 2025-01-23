@@ -199,6 +199,18 @@ export async function handleAppFolioData(
           // Increment the page number for the next batch
           pageNumber += chunkCount;
         } while (!stopLoop);
+
+        // Drop the previous table
+        logger.info(`[INFO] Dropping the old table '${tableName}'...`);
+        await dropTable(tableName);
+        logger.info(`[INFO] Old table '${tableName}' dropped successfully.`);
+
+        // Rename the staging table to the original table name
+        logger.info(`[INFO] Renaming staging table '${stagingTableName}' to '${tableName}'...`);
+        await renameTable(stagingTableName, tableName);
+        logger.info(`[INFO] Staging table '${stagingTableName}' renamed to '${tableName}' successfully.`);
+
+        logger.info(`[INFO] Data handling for table '${tableName}' completed successfully.`);
       }
     } catch (error: any) {
       logger.error(`[ERROR] Error occurred while handling data for table '${tableName}': ${error.message}`);
