@@ -155,7 +155,7 @@ export async function handleAppFolioData(
 
       const uniqueFileName = generateUniqueFileName(tableName);
       saveToCsv(transformedData, stagingTableName, uniqueFileName);
-      const csvFileNames = [];
+      let csvFileNames = [];
       csvFileNames.push(uniqueFileName);
 
       if (next_page_url) {
@@ -192,6 +192,8 @@ export async function handleAppFolioData(
           );
 
           await uploadFilesToSnowFlake(csvFileNames, tableName);
+
+          csvFileNames = []
 
           // Increment the page number for the next batch
           pageNumber += 10;
