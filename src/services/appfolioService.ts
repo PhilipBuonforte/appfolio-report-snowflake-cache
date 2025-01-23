@@ -20,6 +20,11 @@ export async function tryFetchData(
   );
   logger.info(`[INFO] Fetched ${results.length} records from AppFolio API.`);
 
+  if (results.length === 0) {
+    logger.info(`[INFO] No records fetched from AppFolio API. Skipping data handling.`);
+    return { next_page_url, uniqueFileName: null }
+  }
+
   // Transform the data
   const transformedData = transformData(results);
   logger.debug(
@@ -182,7 +187,7 @@ export async function handleAppFolioData(
           });
 
           // Wait for all promises to resolve
-          const results = await Promise.all(promises);
+          const results = (await Promise.all(promises)).filter((result) => result.uniqueFileName !== null);
 
           // Check if any of the results has next_page_url as null
           stopLoop = results.some((result) => result.next_page_url === null);

@@ -1,5 +1,6 @@
 import axios from "axios";
 import dotenv from "dotenv";
+import logger from "../utils/logger";
 
 dotenv.config();
 
@@ -35,7 +36,12 @@ export async function fetchAppFolioData(
       return { results: response.data, next_page_url: null };
     }
   } catch (error: any) {
-    console.error("Error fetching data from AppFolio:", error.message);
-    throw error;
+    if (error.response) {
+      logger.error(`[ERROR] Error fetching data from AppFolio: ${error.response.data}`);
+      return { results: [], next_page_url: null };
+    } else {
+      logger.error(`[ERROR] Error fetching data from AppFolio: ${error.message}`);
+      throw error;
+    }
   }
 }
