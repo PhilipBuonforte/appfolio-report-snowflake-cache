@@ -21,8 +21,8 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
       const endpoint = report.name;
       const tableName = `appfolio_${report.name}`;
       const params = report.params;
+      const insertMethod = report.insertMethod;
       const paginated = true; // Fetch paginated results
-      const insertMethod = SnowFlakeInsertingMethod.BulkInsert;
       const batchSize = 50000; // Batch size for batch inserts
 
       logger.info(`[INFO] Configured endpoint: ${endpoint}`);
@@ -60,8 +60,7 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
       }
 
       logger.warn(
-        `[WARN] Retrying report ${reportKey} (Attempt ${
-          attempt + 1
+        `[WARN] Retrying report ${reportKey} (Attempt ${attempt + 1
         }/${retries})...`
       );
     }
@@ -111,8 +110,7 @@ async function main() {
       logger.info("[INFO] Starting a new pipeline iteration...");
       await processAllReports(); // Process all reports sequentially
       logger.info(
-        `[INFO] Pipeline iteration completed. Waiting ${
-          interval / 1000
+        `[INFO] Pipeline iteration completed. Waiting ${interval / 1000
         } seconds before next run...`
       );
 

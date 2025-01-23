@@ -1,18 +1,23 @@
+import { SnowFlakeInsertingMethod } from "./enum";
+
 const AppFolioReports = {
   // Correct params
   GeneralLedger: {
     name: "general_ledger",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsertV2,
     params: {
       property_visibility: "all",
       project_visibility: "all",
       accounting_basis: "accrual",
       posted_on_from: "01/01/2024",
-      posted_on_to: new Date().toLocaleDateString("en-US"), // Dynamically sets today's date in MM/DD/YYYY format
+      posted_on_to: "03/01/2024",
+      // posted_on_to: new Date().toLocaleDateString("en-US"), // Dynamically sets today's date in MM/DD/YYYY format
     },
   },
   // Correct params
   RentRoll: {
     name: "rent_roll",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
     params: {
       unit_visibility: "all",
       property_visibility: "all",
@@ -22,6 +27,7 @@ const AppFolioReports = {
   },
   BudgetDetail: {
     name: "property_budget",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
     params: {
       period_from: "Jan 2024",
       period_to: "Dec 2025",
@@ -31,6 +37,7 @@ const AppFolioReports = {
   // Correct params
   IncomeStatement: {
     name: "income_statement",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
     params: {
       property_visibility: "all",
       accounting_basis: "Accrual",
@@ -42,6 +49,7 @@ const AppFolioReports = {
   // Correct params
   TenantTickler: {
     name: "tenant_tickler",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
     params: {
       property_visibility: "all",
       occurred_on_from: "01/01/2024",
@@ -51,6 +59,7 @@ const AppFolioReports = {
   // Correct params
   UnitVacancy: {
     name: "unit_vacancy",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
     params: {
       unit_visibility: "all",
       property_visibility: "all",

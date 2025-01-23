@@ -28,7 +28,6 @@ export async function ensureTableExists(
   columns: string[]
 ): Promise<void> {
   const createTableSQL = generateCreateTableSQL(tableName, columns);
-  logger.info(`[INFO] Ensuring table '${tableName}' exists...`);
   logger.debug(`[DEBUG] Executing SQL: ${createTableSQL}`);
 
   await new Promise<void>((resolve, reject) => {
