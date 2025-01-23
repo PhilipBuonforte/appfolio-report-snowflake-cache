@@ -192,7 +192,7 @@ export async function handleAppFolioData(
             .map((result) => result.uniqueFileName)
           );
 
-          await uploadFilesToSnowFlake(csvFileNames, tableName);
+          await uploadFilesToSnowFlake(csvFileNames, stagingTableName);
 
           csvFileNames = []
 
