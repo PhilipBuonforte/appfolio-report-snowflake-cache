@@ -1,7 +1,12 @@
 import { fetchAppFolioData } from "../clients/appfolioClient";
 import { SnowFlakeInsertingMethod } from "../const/enum";
 import { batchInsert } from "./batchInsertService";
-import { bulkInsert, generateUniqueFileName, saveToCsv, uploadFilesToSnowFlake } from "./bulkInsertService";
+import {
+  bulkInsert,
+  generateUniqueFileName,
+  saveToCsv,
+  uploadFilesToSnowFlake,
+} from "./bulkInsertService";
 import { transformData } from "./dataTransformer";
 import { dropTable, ensureTableExists, renameTable } from "./snowflakeService";
 import logger from "../utils/logger";
@@ -21,8 +26,10 @@ export async function tryFetchData(
   logger.info(`[INFO] Fetched ${results.length} records from AppFolio API.`);
 
   if (results.length === 0) {
-    logger.info(`[INFO] No records fetched from AppFolio API. Skipping data handling.`);
-    return { next_page_url, uniqueFileName: null }
+    logger.info(
+      `[INFO] No records fetched from AppFolio API. Skipping data handling.`
+    );
+    return { next_page_url, uniqueFileName: null };
   }
 
   // Transform the data
@@ -40,7 +47,7 @@ export async function tryFetchData(
   // Save to CSV
   saveToCsv(transformedData, tableName, uniqueFileName);
 
-  return { next_page_url, uniqueFileName }
+  return { next_page_url, uniqueFileName };
 }
 
 export async function handleAppFolioData(
@@ -53,13 +60,16 @@ export async function handleAppFolioData(
 ): Promise<void> {
   const stagingTableName = `${tableName}_staging`; // Define the staging table name
 
-
   logger.info(`[INFO] Starting data handling for table '${tableName}'.`);
-  logger.info(`[INFO] Endpoint: ${endpoint}, Paginated: ${paginated}, Insert Method: ${insertMethod}, Batch Size: ${batchSize}`);
+  logger.info(
+    `[INFO] Endpoint: ${endpoint}, Paginated: ${paginated}, Insert Method: ${insertMethod}, Batch Size: ${batchSize}`
+  );
 
-  if (insertMethod === SnowFlakeInsertingMethod.BatchInsert || insertMethod === SnowFlakeInsertingMethod.BulkInsert) {
+  if (
+    insertMethod === SnowFlakeInsertingMethod.BatchInsert ||
+    insertMethod === SnowFlakeInsertingMethod.BulkInsert
+  ) {
     try {
-
       await dropTable(stagingTableName);
 
       if (Array.isArray(params)) {
@@ -69,7 +79,11 @@ export async function handleAppFolioData(
           let isFirstBatch = true; // To track the first batch for table creation
 
           do {
-            logger.info(`[INFO] Fetching data from AppFolio API. Next page URL: ${nextPageUrl || "initial endpoint"}`);
+            logger.info(
+              `[INFO] Fetching data from AppFolio API. Next page URL: ${
+                nextPageUrl || "initial endpoint"
+              }`
+            );
 
             // Fetch data from AppFolio API
             const { results, next_page_url } = await fetchAppFolioData(
@@ -78,7 +92,9 @@ export async function handleAppFolioData(
               !isFirstBatch
             );
 
-            logger.info(`[INFO] Fetched ${results.length} records from AppFolio API.`);
+            logger.info(
+              `[INFO] Fetched ${results.length} records from AppFolio API.`
+            );
 
             // Transform the data
             const transformedData = transformData(results);
@@ -92,24 +108,34 @@ export async function handleAppFolioData(
 
             // Ensure the staging table exists (only for the first batch)
             if (isFirstBatch) {
-              logger.info(`[INFO] Ensuring staging table '${stagingTableName}' exists...`);
+              logger.info(
+                `[INFO] Ensuring staging table '${stagingTableName}' exists...`
+              );
               await ensureTableExists(
                 stagingTableName,
                 Object.keys(transformedData[0])
               );
-              logger.info(`[INFO] Staging table '${stagingTableName}' is ready.`);
+              logger.info(
+                `[INFO] Staging table '${stagingTableName}' is ready.`
+              );
               isFirstBatch = false;
             }
 
             // Insert data into Snowflake
             if (insertMethod === SnowFlakeInsertingMethod.BatchInsert) {
-              logger.info(`[INFO] Inserting data into '${stagingTableName}' using Batch Insert.`);
+              logger.info(
+                `[INFO] Inserting data into '${stagingTableName}' using Batch Insert.`
+              );
               await batchInsert(transformedData, stagingTableName, batchSize);
             } else if (insertMethod === SnowFlakeInsertingMethod.BulkInsert) {
-              logger.info(`[INFO] Inserting data into '${stagingTableName}' using Bulk Insert.`);
+              logger.info(
+                `[INFO] Inserting data into '${stagingTableName}' using Bulk Insert.`
+              );
               await bulkInsert(transformedData, stagingTableName);
             }
-            logger.info(`[INFO] Data inserted into staging table '${stagingTableName}' successfully.`);
+            logger.info(
+              `[INFO] Data inserted into staging table '${stagingTableName}' successfully.`
+            );
 
             // Update the nextPageUrl to continue fetching
             nextPageUrl = next_page_url;
@@ -123,13 +149,21 @@ export async function handleAppFolioData(
       logger.info(`[INFO] Old table '${tableName}' dropped successfully.`);
 
       // Rename the staging table to the original table name
-      logger.info(`[INFO] Renaming staging table '${stagingTableName}' to '${tableName}'...`);
+      logger.info(
+        `[INFO] Renaming staging table '${stagingTableName}' to '${tableName}'...`
+      );
       await renameTable(stagingTableName, tableName);
-      logger.info(`[INFO] Staging table '${stagingTableName}' renamed to '${tableName}' successfully.`);
+      logger.info(
+        `[INFO] Staging table '${stagingTableName}' renamed to '${tableName}' successfully.`
+      );
 
-      logger.info(`[INFO] Data handling for table '${tableName}' completed successfully.`);
+      logger.info(
+        `[INFO] Data handling for table '${tableName}' completed successfully.`
+      );
     } catch (error: any) {
-      logger.error(`[ERROR] Error occurred while handling data for table '${tableName}': ${error.message}`);
+      logger.error(
+        `[ERROR] Error occurred while handling data for table '${tableName}': ${error.message}`
+      );
       throw error; // Re-throw the error for further handling
     }
   }

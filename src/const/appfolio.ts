@@ -1,19 +1,17 @@
+import { generateGeneralLedgerParams } from "../utils/paramGenerator";
 import { SnowFlakeInsertingMethod } from "./enum";
 
 const AppFolioReports = {
   // Correct params
-  // GeneralLedger: {
-  //   name: "general_ledger",
-  //   insertMethod: SnowFlakeInsertingMethod.BulkInsertV2,
-  //   params: {
-  //     property_visibility: "all",
-  //     project_visibility: "all",
-  //     accounting_basis: "accrual",
-  //     posted_on_from: "01/01/2024",
-  //     // posted_on_to: "03/01/2024",
-  //     posted_on_to: new Date().toLocaleDateString("en-US"), // Dynamically sets today's date in MM/DD/YYYY format
-  //   },
-  // },
+  GeneralLedger: {
+    name: "general_ledger",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
+    params: generateGeneralLedgerParams(
+      "01/01/2023",
+      new Date().toLocaleDateString("en-US"),
+      2
+    ),
+  },
   // Correct params
   RentRoll: {
     name: "rent_roll",
@@ -27,6 +25,7 @@ const AppFolioReports = {
       },
     ],
   },
+  // Correct params
   BudgetDetail: {
     name: "property_budget",
     insertMethod: SnowFlakeInsertingMethod.BulkInsert,
@@ -85,3 +84,11 @@ const AppFolioReports = {
 };
 
 export default AppFolioReports;
+
+console.log(
+  generateGeneralLedgerParams(
+    "01/01/2023",
+    new Date().toLocaleDateString("en-US"),
+    2
+  )
+);
