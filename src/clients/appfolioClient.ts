@@ -15,7 +15,7 @@ const DATABASE_ID = process.env.APPFOLIO_DATABASE_ID!;
  */
 export async function fetchAppFolioData(
   endpoint: string,
-  params: Record<string, string | number | boolean> = {},
+  params: Record<string, string | number | boolean | string[]> = {},
   paginated: boolean = false
 ): Promise<any> {
   try {

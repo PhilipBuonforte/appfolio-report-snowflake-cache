@@ -1,3 +1,4 @@
+import { AgedReceivablesParam } from "../types/AgedReceivablesParam";
 import { GeneralLedgerParam } from "../types/GeneralLedgerParam";
 
 export function generateGeneralLedgerParams(
@@ -34,4 +35,21 @@ export function generateGeneralLedgerParams(
   }
 
   return paramsList;
+}
+
+
+export function generateAgedReceivablesParams(
+): AgedReceivablesParam[] {
+  const today = new Date();
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Last day of the current month
+  const formattedDate = endOfMonth.toLocaleDateString("en-US"); // Format as MM/DD/YYYY
+
+  return [
+    {
+      paginate_results: false,
+      property_visibility: "all",
+      tenant_statuses: [],
+      occurred_on_to: formattedDate
+    },
+  ];
 }

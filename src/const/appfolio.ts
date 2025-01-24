@@ -1,4 +1,4 @@
-import { generateGeneralLedgerParams } from "../utils/paramGenerator";
+import { generateAgedReceivablesParams, generateGeneralLedgerParams } from "../utils/paramGenerator";
 import { SnowFlakeInsertingMethod } from "./enum";
 
 const AppFolioReports = {
@@ -81,14 +81,19 @@ const AppFolioReports = {
       },
     ],
   },
+  ChartOfAccounts: {
+    name: "chart_of_accounts",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
+    params: [
+      {
+      },
+    ],
+  },
+  AgedReceivableDetail: {
+    name: "aged_receivables_detail",
+    insertMethod: SnowFlakeInsertingMethod.BulkInsert,
+    params: generateAgedReceivablesParams(),
+  },
 };
 
 export default AppFolioReports;
-
-console.log(
-  generateGeneralLedgerParams(
-    "01/01/2023",
-    new Date().toLocaleDateString("en-US"),
-    2
-  )
-);

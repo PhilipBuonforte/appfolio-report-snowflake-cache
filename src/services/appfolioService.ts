@@ -56,7 +56,7 @@ export async function handleAppFolioData(
   paginated: boolean,
   insertMethod: SnowFlakeInsertingMethod,
   batchSize: number = 5000,
-  params: Record<string, string | number | boolean>[]
+  params: Record<string, string | number | boolean | string[]>[] = []
 ): Promise<void> {
   const stagingTableName = `${tableName}_staging`; // Define the staging table name
 
@@ -80,8 +80,7 @@ export async function handleAppFolioData(
 
           do {
             logger.info(
-              `[INFO] Fetching data from AppFolio API. Next page URL: ${
-                nextPageUrl || "initial endpoint"
+              `[INFO] Fetching data from AppFolio API. Next page URL: ${nextPageUrl || "initial endpoint"
               }`
             );
 
