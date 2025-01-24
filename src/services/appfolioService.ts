@@ -52,20 +52,22 @@ export async function handleAppFolioData(
   params: Record<string, string | number | boolean>[]
 ): Promise<void> {
   const stagingTableName = `${tableName}_staging`; // Define the staging table name
-  let nextPageUrl: string | null = null;
+
 
   logger.info(`[INFO] Starting data handling for table '${tableName}'.`);
   logger.info(`[INFO] Endpoint: ${endpoint}, Paginated: ${paginated}, Insert Method: ${insertMethod}, Batch Size: ${batchSize}`);
 
   if (insertMethod === SnowFlakeInsertingMethod.BatchInsert || insertMethod === SnowFlakeInsertingMethod.BulkInsert) {
     try {
-      // Ensure the staging table exists
-      let isFirstBatch = true; // To track the first batch for table creation
 
       await dropTable(stagingTableName);
 
       if (Array.isArray(params)) {
         for (const param of params) {
+          let nextPageUrl: string | null = null;
+          // Ensure the staging table exists
+          let isFirstBatch = true; // To track the first batch for table creation
+
           do {
             logger.info(`[INFO] Fetching data from AppFolio API. Next page URL: ${nextPageUrl || "initial endpoint"}`);
 
