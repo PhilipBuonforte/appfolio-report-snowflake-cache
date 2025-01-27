@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "typeRoots": ["./node_modules/@types"]
+    "outDir": "dist", // Output directory for compiled JavaScript files
+    "rootDir": "src", // Root directory of your TypeScript source files
+    "target": "ES2020", // ECMAScript version for output
+    "module": "commonjs", // Module system to use
+    "strict": true, // Enable strict type checking
+    "esModuleInterop": true, // Allow default imports from CommonJS modules
+    "skipLibCheck": true // Skip type checking of declaration files
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"], // Include all TypeScript files in the src directory
+  "exclude": ["node_modules", "dist"] // Exclude these directories
 }
