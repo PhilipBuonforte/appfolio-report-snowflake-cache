@@ -151,7 +151,7 @@ export async function saveToCsv(
 
 export async function uploadFilesToSnowFlake(
   csvFileNames: string[],
-  tableName: string,
+  tableName: string
 ) {
   for (let index = 0; index < csvFileNames.length; index++) {
     const fileName = csvFileNames[index];
@@ -161,10 +161,7 @@ export async function uploadFilesToSnowFlake(
   }
 }
 
-export async function uploadCsvFile(
-  tableName: string,
-  csvFilePath: string
-) {
+export async function uploadCsvFile(tableName: string, csvFilePath: string) {
   // Snowflake commands
   const stageName = `@%${tableName}`;
   const normalizedCsvFilePath = csvFilePath.replace(/\\/g, "/"); // Normalize path for Windows
@@ -183,7 +180,10 @@ export async function uploadCsvFile(
 
   try {
     // Upload CSV file to Snowflake stage
-    await executeSnowflakeQuery(putSQL, "Uploading CSV file to Snowflake stage");
+    await executeSnowflakeQuery(
+      putSQL,
+      "Uploading CSV file to Snowflake stage"
+    );
 
     // Load data from stage to Snowflake table
     await executeSnowflakeQuery(copySQL, "Loading data into Snowflake table");
@@ -202,5 +202,35 @@ export async function uploadCsvFile(
         err
       );
     }
+  }
+}
+
+/**
+ * Removes existing records from a Snowflake table based on a date range.
+ * @param tableName Name of the Snowflake table.
+ * @param field_name Date field name to filter on.
+ * @param from Start date in 'MM-DD-YYYY' format.
+ * @param to End date in 'MM-DD-YYYY' format.
+ */
+export async function removeExistingRecords(
+  tableName: string,
+  field_name: string,
+  from: string,
+  to: string
+) {
+  try {
+    // Convert 'MM-DD-YYYY' to 'YYYY-MM-DD' format using TO_DATE() function for both field and date range
+    const sqlText = `
+      DELETE FROM ${tableName}
+      WHERE TO_DATE(${field_name}, 'MM-DD-YYYY') BETWEEN TO_DATE('${from}', 'MM-DD-YYYY') AND TO_DATE('${to}', 'MM-DD-YYYY');
+    `;
+
+    await executeSnowflakeQuery(
+      sqlText,
+      "Removing existing records from Snowflake table"
+    );
+  } catch (error) {
+    logger.error("[ERROR] Removing existing records failed:", error);
+    throw error;
   }
 }

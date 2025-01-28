@@ -1,8 +1,10 @@
 import { connectToSnowflake } from "./clients/snowflakeClient";
-import AppFolioReports from "./const/appfolio";
+import GenerateAppFolioReports from "./const/appfolio";
 import { SnowFlakeInsertingMethod } from "./const/enum";
 import { handleAppFolioData } from "./services/appfolioService";
 import logger from "./utils/logger"; // Import Winston logger
+
+const AppFolioReports = GenerateAppFolioReports();
 
 type AppFolioReportKey = keyof typeof AppFolioReports;
 
@@ -20,16 +22,11 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
 
       const endpoint = report.name;
       const tableName = `appfolio_${report.name}`;
-      const params = report.params;
       const insertMethod = report.insertMethod;
+      const params = report.params;
+      const optionalParams = report.optionalParams;
       const paginated = true; // Fetch paginated results
       const batchSize = 50000; // Batch size for batch inserts
-
-      logger.info(`[INFO] Configured endpoint: ${endpoint}`);
-      logger.info(`[INFO] Target table: ${tableName}`);
-      logger.info(`[INFO] Insert method: ${insertMethod}`);
-      logger.info(`[INFO] Batch size: ${batchSize}`);
-      logger.info(`[INFO] Paginated fetch: ${paginated}`);
 
       // Handle AppFolio data
       logger.info("[INFO] Fetching and inserting AppFolio data...");
@@ -39,7 +36,8 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
         paginated,
         insertMethod,
         batchSize,
-        params
+        params,
+        optionalParams
       );
 
       logger.info(`[INFO] Report ${reportKey} completed successfully.`);
@@ -60,7 +58,8 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
       }
 
       logger.warn(
-        `[WARN] Retrying report ${reportKey} (Attempt ${attempt + 1
+        `[WARN] Retrying report ${reportKey} (Attempt ${
+          attempt + 1
         }/${retries})...`
       );
     }
@@ -110,7 +109,8 @@ async function main() {
       logger.info("[INFO] Starting a new pipeline iteration...");
       await processAllReports(); // Process all reports sequentially
       logger.info(
-        `[INFO] Pipeline iteration completed. Waiting ${interval / 1000
+        `[INFO] Pipeline iteration completed. Waiting ${
+          interval / 1000
         } seconds before next run...`
       );
 

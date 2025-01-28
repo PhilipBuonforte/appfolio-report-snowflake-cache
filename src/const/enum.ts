@@ -1,5 +1,5 @@
 export enum SnowFlakeInsertingMethod {
   BatchInsert,
   BulkInsert,
-  BulkInsertV2,
+  BulkUpsert,
 }

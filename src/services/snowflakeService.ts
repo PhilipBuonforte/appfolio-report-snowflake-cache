@@ -62,6 +62,35 @@ export async function dropTable(tableName: string): Promise<void> {
 }
 
 /**
+ * Duplicates the specified table in Snowflake by creating a new table with the same structure and data.
+ * @param originalTableName Name of the table to duplicate.
+ * @param newTableName Name of the new table to be created.
+ */
+export async function duplicateTable(
+  originalTableName: string,
+  newTableName: string
+): Promise<void> {
+  // SQL to duplicate the table
+  const duplicateTableSQL = `CREATE TABLE ${newTableName} AS SELECT * FROM ${originalTableName};`;
+
+  logger.info(
+    `[INFO] Duplicating table '${originalTableName}' to '${newTableName}'...`
+  );
+  logger.debug(`[DEBUG] Executing SQL: ${duplicateTableSQL}`);
+
+  await new Promise<void>((resolve, reject) => {
+    connection.execute({
+      sqlText: duplicateTableSQL,
+      complete: (err) => (err ? reject(err) : resolve()),
+    });
+  });
+
+  logger.info(
+    `[INFO] Table '${originalTableName}' duplicated successfully as '${newTableName}'.`
+  );
+}
+
+/**
  * Renames a table in Snowflake.
  * @param oldName Current name of the table.
  * @param newName New name for the table.

@@ -1,5 +1,8 @@
 import { AgedReceivablesParam } from "../types/AgedReceivablesParam";
 import { GeneralLedgerParam } from "../types/GeneralLedgerParam";
+import { RentRollParam } from "../types/RentRollParam";
+import { generateDates, getStartAndEndOfMonth } from "./date";
+import { getReportCacheState, saveState } from "./state";
 
 export function generateGeneralLedgerParams(
   startDate: string,
@@ -37,19 +40,199 @@ export function generateGeneralLedgerParams(
   return paramsList;
 }
 
+export function generateAgedReceivablesParams(): {
+  params: AgedReceivablesParam[];
+  from: string;
+  to: string;
+  isFirstRun: boolean;
+} {
+  const report_name = "aged_receivables_detail";
+  const state = getReportCacheState(report_name);
+  const now = new Date();
 
-export function generateAgedReceivablesParams(
-): AgedReceivablesParam[] {
-  const today = new Date();
-  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0); // Last day of the current month
-  const formattedDate = endOfMonth.toLocaleDateString("en-US"); // Format as MM/DD/YYYY
+  // Define January 1, 2023, as the starting date
+  const startDate = new Date("2023-01-01");
 
-  return [
-    {
+  if (state.isFirstRun) {
+    // Generate params for all days since January 1, 2023, to today
+    const allDates = generateDates(startDate, now);
+    const params = allDates.map((date) => ({
       paginate_results: false,
       property_visibility: "all",
       tenant_statuses: [],
-      occurred_on_to: formattedDate
-    },
-  ];
+      occurred_on_to: date,
+    }));
+
+    // Update state to indicate the first run is complete
+    saveState(report_name, { isFirstRun: false });
+
+    // Get the "from" and "to" dates
+    const from = params.length > 0 ? params[0].occurred_on_to : ""; // First date in the array
+    const to =
+      params.length > 0 ? params[params.length - 1].occurred_on_to : ""; // Last date in the array
+
+    return { params, from, to, isFirstRun: true };
+  } else {
+    const dayOfMonth = now.getDate();
+    const params: AgedReceivablesParam[] = [];
+
+    if (dayOfMonth <= 14) {
+      // Fetch the entire previous month
+      const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // Handle January edge case
+      const yearForPreviousMonth =
+        now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const { start: prevStart, end: prevEnd } = getStartAndEndOfMonth(
+        yearForPreviousMonth,
+        previousMonth
+      );
+
+      const previousMonthDates = generateDates(prevStart, prevEnd);
+      params.push(
+        ...previousMonthDates.map((date) => ({
+          paginate_results: false,
+          property_visibility: "all",
+          tenant_statuses: [],
+          occurred_on_to: date,
+        }))
+      );
+
+      // Fetch current month's data up to today
+      const currentMonth = now.getMonth() + 1; // Current month is zero-based in JavaScript
+      const { start: currStart } = getStartAndEndOfMonth(
+        now.getFullYear(),
+        currentMonth
+      );
+
+      const currentMonthDates = generateDates(currStart, now);
+      params.push(
+        ...currentMonthDates.map((date) => ({
+          paginate_results: false,
+          property_visibility: "all",
+          tenant_statuses: [],
+          occurred_on_to: date,
+        }))
+      );
+    } else {
+      // Fetch current month's data up to today (from the 15th onward)
+      const currentMonth = now.getMonth() + 1;
+      const { start: currStart } = getStartAndEndOfMonth(
+        now.getFullYear(),
+        currentMonth
+      );
+
+      const currentMonthDates = generateDates(currStart, now);
+      params.push(
+        ...currentMonthDates.map((date) => ({
+          paginate_results: false,
+          property_visibility: "all",
+          tenant_statuses: [],
+          occurred_on_to: date,
+        }))
+      );
+    }
+
+    // Get the "from" and "to" dates
+    const from = params.length > 0 ? params[0].occurred_on_to : ""; // First date in the array
+    const to =
+      params.length > 0 ? params[params.length - 1].occurred_on_to : ""; // Last date in the array
+
+    return { params, from, to, isFirstRun: false };
+  }
+}
+
+export function generateRentRollParams(): {
+  params: RentRollParam[];
+  from: string;
+  to: string;
+  isFirstRun: boolean;
+} {
+  const report_name = "rent_roll";
+  const state = getReportCacheState(report_name);
+  const now = new Date();
+
+  // Define January 1, 2023, as the starting date
+  const startDate = new Date("2023-01-01");
+
+  if (state.isFirstRun) {
+    // Generate params for all days since January 1, 2023, to today
+    const allDates = generateDates(startDate, now);
+    const params = allDates.map((date) => ({
+      unit_visibility: "all",
+      property_visibility: "all",
+      non_revenue_units: "1",
+      as_of_to: date,
+    }));
+
+    // Update state to indicate the first run is complete
+    saveState(report_name, { isFirstRun: false });
+
+    // Get the "from" and "to" dates
+    const from = params.length > 0 ? params[0].as_of_to : ""; // First date in the array
+    const to = params.length > 0 ? params[params.length - 1].as_of_to : ""; // Last date in the array
+
+    return { params, from, to, isFirstRun: true };
+  } else {
+    const dayOfMonth = now.getDate();
+    const params: RentRollParam[] = [];
+
+    if (dayOfMonth <= 14) {
+      // Fetch the entire previous month
+      const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // Handle January edge case
+      const yearForPreviousMonth =
+        now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const { start: prevStart, end: prevEnd } = getStartAndEndOfMonth(
+        yearForPreviousMonth,
+        previousMonth
+      );
+
+      const previousMonthDates = generateDates(prevStart, prevEnd);
+      params.push(
+        ...previousMonthDates.map((date) => ({
+          unit_visibility: "all",
+          property_visibility: "all",
+          non_revenue_units: "1",
+          as_of_to: date,
+        }))
+      );
+
+      // Fetch current month's data up to today
+      const currentMonth = now.getMonth() + 1; // Current month is zero-based in JavaScript
+      const { start: currStart } = getStartAndEndOfMonth(
+        now.getFullYear(),
+        currentMonth
+      );
+
+      const currentMonthDates = generateDates(currStart, now);
+      params.push(
+        ...currentMonthDates.map((date) => ({
+          unit_visibility: "all",
+          property_visibility: "all",
+          non_revenue_units: "1",
+          as_of_to: date,
+        }))
+      );
+    } else {
+      // Fetch current month's data up to today (from the 15th onward)
+      const currentMonth = now.getMonth() + 1;
+      const { start: currStart } = getStartAndEndOfMonth(
+        now.getFullYear(),
+        currentMonth
+      );
+
+      const currentMonthDates = generateDates(currStart, now);
+      params.push(
+        ...currentMonthDates.map((date) => ({
+          unit_visibility: "all",
+          property_visibility: "all",
+          non_revenue_units: "1",
+          as_of_to: date,
+        }))
+      );
+    }
+
+    const from = params.length > 0 ? params[0].as_of_to : ""; // First date in the array
+    const to = params.length > 0 ? params[params.length - 1].as_of_to : ""; // Last date in the array
+
+    return { params, from, to, isFirstRun: false };
+  }
 }
