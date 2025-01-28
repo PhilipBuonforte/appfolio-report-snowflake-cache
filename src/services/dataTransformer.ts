@@ -1,3 +1,5 @@
+import { convertToMMDDYYYY } from "../utils/date";
+
 export interface AppFolioData {
   [key: string]: string | number | null;
 }
@@ -32,9 +34,9 @@ export function transformData(
     updatedItem["fetched_at"] = new Date().toISOString();
 
     if (endpoint === "aged_receivables_detail" && param)
-      updatedItem["as_of_date"] = param.occurred_on_to;
+      updatedItem["as_of_date"] = convertToMMDDYYYY(param.occurred_on_to);
     else if (endpoint === "rent_roll" && param)
-      updatedItem["as_of_date"] = param.as_of_to;
+      updatedItem["as_of_date"] = convertToMMDDYYYY(param.as_of_to);
     return updatedItem;
   });
 }
