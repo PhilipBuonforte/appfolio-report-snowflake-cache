@@ -1,6 +1,7 @@
 import { fetchAppFolioData } from "../clients/appfolioClient";
 import { SnowFlakeInsertingMethod } from "../const/enum";
 import { OptionalParam } from "../types/OptionalParam";
+import { convertToMMDDYYYY } from "../utils/date";
 import logger from "../utils/logger";
 import { batchInsert } from "./batchInsertService";
 import { bulkInsert, removeExistingRecords } from "./bulkInsertService";
@@ -121,8 +122,8 @@ export async function handleAppFolioData(
       await removeExistingRecords(
         stagingTableName,
         "as_of_date",
-        optionalParams.from,
-        optionalParams.to
+        convertToMMDDYYYY(optionalParams.from),
+        convertToMMDDYYYY(optionalParams.to)
       );
 
       for (const param of params) {

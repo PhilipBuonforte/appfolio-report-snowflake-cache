@@ -25,3 +25,15 @@ export function getStartAndEndOfMonth(
   const end = new Date(year, month, 0); // Last day of the month
   return { start, end };
 }
+
+export function convertToMMDDYYYY(date: string): string {
+  // Split the input date by '/'
+  const [month, day, year] = date.split("/");
+
+  // Ensure two-digit format for month and day
+  const formattedMonth = month.padStart(2, "0");
+  const formattedDay = day.padStart(2, "0");
+
+  // Return the date in 'MM-DD-YYYY' format
+  return `${formattedMonth}-${formattedDay}-${year}`;
+}

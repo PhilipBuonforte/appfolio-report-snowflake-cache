@@ -157,6 +157,7 @@ export function generateRentRollParams(): {
     // Generate params for all days since January 1, 2023, to today
     const allDates = generateDates(startDate, now);
     const params = allDates.map((date) => ({
+      paginate_results: false,
       unit_visibility: "all",
       property_visibility: "all",
       non_revenue_units: "1",
@@ -188,6 +189,7 @@ export function generateRentRollParams(): {
       const previousMonthDates = generateDates(prevStart, prevEnd);
       params.push(
         ...previousMonthDates.map((date) => ({
+          paginate_results: false,
           unit_visibility: "all",
           property_visibility: "all",
           non_revenue_units: "1",
@@ -205,6 +207,7 @@ export function generateRentRollParams(): {
       const currentMonthDates = generateDates(currStart, now);
       params.push(
         ...currentMonthDates.map((date) => ({
+          paginate_results: false,
           unit_visibility: "all",
           property_visibility: "all",
           non_revenue_units: "1",
@@ -222,6 +225,7 @@ export function generateRentRollParams(): {
       const currentMonthDates = generateDates(currStart, now);
       params.push(
         ...currentMonthDates.map((date) => ({
+          paginate_results: false,
           unit_visibility: "all",
           property_visibility: "all",
           non_revenue_units: "1",
