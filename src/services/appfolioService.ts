@@ -112,6 +112,9 @@ export async function handleAppFolioData(
       optionalParams &&
       !optionalParams.isFirstRun
     ) {
+      logger.info(
+        `[INFO] Handling data for table '${tableName}' using Bulk Upsert.`
+      );
       await dropTable(stagingTableName);
       await duplicateTable(tableName, stagingTableName);
 
