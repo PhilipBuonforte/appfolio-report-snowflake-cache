@@ -39,10 +39,10 @@ export async function handleAppFolioData(
       await dropTable(stagingTableName);
 
       for (const param of params) {
+        logger.info(`[INFO] Fetching data for param: ${JSON.stringify(param)}`);
         let nextPageUrl: string | null = null;
         // Ensure the staging table exists
         let isFirstBatch = true; // To track the first batch for table creation
-
         do {
           logger.info(
             `[INFO] Fetching data from AppFolio API. Next page URL: ${
@@ -123,6 +123,8 @@ export async function handleAppFolioData(
       );
 
       for (const param of params) {
+        logger.info(`[INFO] Fetching data for param: ${JSON.stringify(param)}`);
+
         let nextPageUrl: string | null = null;
         // Ensure the staging table exists
         let isFirstBatch = true; // To track the first batch for table creation
