@@ -102,7 +102,7 @@ async function processAllReports() {
  * Main function to run the pipeline at intervals
  */
 async function main() {
-  const interval = 5 * 60 * 1000; // Interval in milliseconds (e.g., 1 hour)
+  const interval = 60 * 60 * 1000; // Interval in milliseconds (e.g., 1 hour)
 
   try {
     while (true) {
