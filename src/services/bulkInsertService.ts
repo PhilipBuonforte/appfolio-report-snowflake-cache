@@ -227,7 +227,7 @@ export async function removeExistingRecords(
 
     await executeSnowflakeQuery(
       sqlText,
-      "Removing existing records from Snowflake table"
+      `Removing existing records from Snowflake table based on date range: ${from} to ${to}`
     );
   } catch (error) {
     logger.error("[ERROR] Removing existing records failed:", error);

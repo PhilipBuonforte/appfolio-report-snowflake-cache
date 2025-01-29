@@ -94,7 +94,7 @@ const GenerateAppFolioReports = () => {
       optionalParams: {
         isFirstRun: agedReceivablesParams.isFirstRun,
         from: agedReceivablesParams.from,
-        to: agedReceivablesParams.from,
+        to: agedReceivablesParams.to,
       },
     },
 
@@ -105,7 +105,7 @@ const GenerateAppFolioReports = () => {
       optionalParams: {
         isFirstRun: rentRollParams.isFirstRun,
         from: rentRollParams.from,
-        to: rentRollParams.from,
+        to: rentRollParams.to,
       },
     },
   };
