@@ -20,7 +20,7 @@ export async function handleAppFolioData(
   insertMethod: SnowFlakeInsertingMethod,
   batchSize: number = 5000,
   params: Record<string, string | number | boolean | string[]>[] = [],
-  optionalParams?: OptionalParam
+  optionalParams?: OptionalParam | null
 ): Promise<void> {
   const stagingTableName = `${tableName}_staging`; // Define the staging table name
 

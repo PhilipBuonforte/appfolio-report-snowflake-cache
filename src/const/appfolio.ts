@@ -19,6 +19,7 @@ const GenerateAppFolioReports = () => {
         new Date().toLocaleDateString("en-US"),
         2
       ),
+      optionalParams: null,
     },
 
     // Correct params
@@ -39,6 +40,7 @@ const GenerateAppFolioReports = () => {
           property_visibility: "all",
         },
       ],
+      optionalParams: null,
     },
     // Correct params
     IncomeStatement: {
@@ -53,6 +55,7 @@ const GenerateAppFolioReports = () => {
           posted_on_to: `${new Date().getFullYear()}-12`,
         },
       ],
+      optionalParams: null,
     },
     // Correct params
     TenantTickler: {
@@ -65,6 +68,7 @@ const GenerateAppFolioReports = () => {
           occurred_on_to: new Date().toLocaleDateString("en-US"),
         },
       ],
+      optionalParams: null,
     },
     // Correct params
     UnitVacancy: {
@@ -76,6 +80,7 @@ const GenerateAppFolioReports = () => {
           property_visibility: "all",
         },
       ],
+      optionalParams: null,
     },
 
     // Correct params
@@ -83,6 +88,7 @@ const GenerateAppFolioReports = () => {
       name: "chart_of_accounts",
       insertMethod: SnowFlakeInsertingMethod.BulkInsert,
       params: [{}],
+      optionalParams: null,
     },
 
     AgedReceivableDetail: {
