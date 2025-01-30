@@ -39,6 +39,8 @@ Update the configuration file located at `config/config.json` with your Appfolio
 Create a `.env` file in the root directory and add the following environment variables:
 
 ```plaintext
+APPFOLIO_CLIENT_ID=your_appfolio_client_id
+APPFOLIO_CLIENT_SECRET=your_appfolio_client_secret
 APPFOLIO_API_KEY=your_appfolio_api_key
 SNOWFLAKE_ACCOUNT=your_snowflake_account
 SNOWFLAKE_USER=your_snowflake_user
