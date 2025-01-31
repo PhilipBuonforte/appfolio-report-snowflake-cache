@@ -1,8 +1,8 @@
 import { connectToSnowflake } from "./clients/snowflakeClient";
 import GenerateAppFolioReports from "./const/appfolio";
-import { SnowFlakeInsertingMethod } from "./const/enum";
 import { handleAppFolioData } from "./services/appfolioService";
 import logger from "./utils/logger"; // Import Winston logger
+import { getTimeUntilNext8AM, isWithinAllowedTime } from "./utils/time";
 
 const AppFolioReports = GenerateAppFolioReports();
 
@@ -106,6 +106,18 @@ async function main() {
 
   try {
     while (true) {
+      // Check if the current time is within the allowed window
+      if (!isWithinAllowedTime()) {
+        const timeUntilNext8AM = getTimeUntilNext8AM();
+        logger.info(
+          `[INFO] Current time is outside the allowed window (8 AM - 8 PM EST). Waiting ${
+            timeUntilNext8AM / 1000 / 60
+          } minutes until 8 AM...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, timeUntilNext8AM)); // Wait until 8 AM
+        continue;
+      }
+
       logger.info("[INFO] Starting a new pipeline iteration...");
       await processAllReports(); // Process all reports sequentially
       logger.info(
