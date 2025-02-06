@@ -91,6 +91,7 @@ const GenerateAppFolioReports = () => {
       optionalParams: null,
     },
 
+    // Correct params
     AgedReceivableDetail: {
       name: "aged_receivables_detail",
       insertMethod: SnowFlakeInsertingMethod.BulkUpsert,
@@ -102,6 +103,7 @@ const GenerateAppFolioReports = () => {
       },
     },
 
+    // Correct params
     RentRoll: {
       name: "rent_roll",
       insertMethod: SnowFlakeInsertingMethod.BulkUpsert,
@@ -111,6 +113,18 @@ const GenerateAppFolioReports = () => {
         from: rentRollParams.from,
         to: rentRollParams.to,
       },
+    },
+
+    // Correct params
+    PropertyDirectory: {
+      name: "property_directory",
+      insertMethod: SnowFlakeInsertingMethod.BulkInsert,
+      params: [
+        {
+          property_visibility: "all",
+        },
+      ],
+      optionalParams: null,
     },
   };
 };
