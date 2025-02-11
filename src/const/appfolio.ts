@@ -126,6 +126,30 @@ const GenerateAppFolioReports = () => {
       ],
       optionalParams: null,
     },
+
+    // Correct params
+    UnitDirectory: {
+      name: "unit_directory",
+      insertMethod: SnowFlakeInsertingMethod.BatchInsert,
+      params: [
+        {
+          unit_visibility: "all",
+        },
+      ],
+      optionalParams: null,
+    },
+
+    // Correct params
+    PropertyGroupDirectory: {
+      name: "property_group_directory",
+      insertMethod: SnowFlakeInsertingMethod.BatchInsert,
+      params: [
+        {
+          property_visibility: "all",
+        },
+      ],
+      optionalParams: null,
+    },
   };
 };
 
