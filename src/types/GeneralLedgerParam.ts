@@ -4,4 +4,5 @@ export type GeneralLedgerParam = {
   accounting_basis: string;
   posted_on_from: string;
   posted_on_to: string;
+  reverse_transaction: string;
 };

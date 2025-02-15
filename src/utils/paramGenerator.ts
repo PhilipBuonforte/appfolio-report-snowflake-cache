@@ -28,6 +28,7 @@ export function generateGeneralLedgerParams(
       property_visibility: "all",
       project_visibility: "all",
       accounting_basis: "accrual",
+      reverse_transaction: "1",
       posted_on_from: currentStart.toLocaleDateString("en-US"),
       posted_on_to: currentEnd.toLocaleDateString("en-US"),
     });
