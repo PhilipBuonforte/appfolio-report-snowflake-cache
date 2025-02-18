@@ -16,7 +16,11 @@ const GenerateAppFolioReports = () => {
       insertMethod: SnowFlakeInsertingMethod.BulkInsert,
       params: generateGeneralLedgerParams(
         "01/01/2023",
-        new Date().toLocaleDateString("en-US"),
+        new Date(
+          new Date().getFullYear(),
+          new Date().getMonth() + 1,
+          0
+        ).toLocaleDateString("en-US"),
         2
       ),
       optionalParams: null,
