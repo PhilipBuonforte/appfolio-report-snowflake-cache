@@ -173,6 +173,7 @@ export async function handleAppFolioData(
 
           // Update the nextPageUrl to continue fetching
           nextPageUrl = next_page_url;
+          isFirstBatch = false;
         } while (nextPageUrl);
       }
     }

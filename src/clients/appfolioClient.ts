@@ -23,6 +23,8 @@ export async function fetchAppFolioData(
       ? `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com${endpoint}`
       : `https://${CLIENT_ID}:${CLIENT_SECRET}@${DATABASE_ID}.appfolio.com/api/v2/reports/${endpoint}.json`;
 
+    console.log(url, paginated);
+
     const response = paginated
       ? await axios.post(url, {})
       : await axios.post(url, params);
@@ -37,10 +39,14 @@ export async function fetchAppFolioData(
     }
   } catch (error: any) {
     if (error.response) {
-      logger.error(`[ERROR] Error fetching data from AppFolio: ${error.response.data}`);
+      logger.error(
+        `[ERROR] Error fetching data from AppFolio: ${error.response.data}`
+      );
       return { results: [], next_page_url: null };
     } else {
-      logger.error(`[ERROR] Error fetching data from AppFolio: ${error.message}`);
+      logger.error(
+        `[ERROR] Error fetching data from AppFolio: ${error.message}`
+      );
       throw error;
     }
   }
