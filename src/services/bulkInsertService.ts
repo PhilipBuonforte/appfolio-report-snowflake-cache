@@ -208,13 +208,14 @@ export async function uploadCsvFile(tableName: string, csvFilePath: string) {
 /**
  * Removes existing records from a Snowflake table based on a date range.
  * @param tableName Name of the Snowflake table.
- * @param field_name Date field name to filter on.
+ * @param date_field_name Date field name to filter on.
  * @param from Start date in 'MM-DD-YYYY' format.
  * @param to End date in 'MM-DD-YYYY' format.
  */
 export async function removeExistingRecords(
   tableName: string,
-  field_name: string,
+  date_field_name: string,
+  date_field_format: string,
   from: string,
   to: string
 ) {
@@ -222,7 +223,7 @@ export async function removeExistingRecords(
     // Convert 'MM-DD-YYYY' to 'YYYY-MM-DD' format using TO_DATE() function for both field and date range
     const sqlText = `
       DELETE FROM ${tableName}
-      WHERE TO_DATE(${field_name}, 'MM-DD-YYYY') BETWEEN TO_DATE('${from}', 'MM-DD-YYYY') AND TO_DATE('${to}', 'MM-DD-YYYY');
+      WHERE TO_DATE(${date_field_name}, '${date_field_format}') BETWEEN TO_DATE('${from}', 'MM-DD-YYYY') AND TO_DATE('${to}', 'MM-DD-YYYY');
     `;
 
     await executeSnowflakeQuery(
@@ -232,5 +233,10 @@ export async function removeExistingRecords(
   } catch (error) {
     logger.error("[ERROR] Removing existing records failed:", error);
     throw error;
+  } finally {
+    logger.info(
+      "[INFO] Completed attempt to remove existing records for table:",
+      tableName
+    );
   }
 }

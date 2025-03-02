@@ -1,3 +1,4 @@
+import logger from "../utils/logger";
 import {
   generateAgedReceivablesParams,
   generateGeneralLedgerParams,
@@ -6,6 +7,7 @@ import {
 import { SnowFlakeInsertingMethod } from "./enum";
 
 const GenerateAppFolioReports = () => {
+  const generalLedgerParams = generateGeneralLedgerParams();
   const agedReceivablesParams = generateAgedReceivablesParams();
   const rentRollParams = generateRentRollParams();
 
@@ -13,17 +15,15 @@ const GenerateAppFolioReports = () => {
     // Correct params
     GeneralLedger: {
       name: "general_ledger",
-      insertMethod: SnowFlakeInsertingMethod.BulkInsert,
-      params: generateGeneralLedgerParams(
-        "01/01/2023",
-        new Date(
-          new Date().getFullYear(),
-          new Date().getMonth() + 1,
-          0
-        ).toLocaleDateString("en-US"),
-        2
-      ),
-      optionalParams: null,
+      insertMethod: SnowFlakeInsertingMethod.BulkUpsert,
+      params: generalLedgerParams.params,
+      optionalParams: {
+        dateField: "post_date",
+        dateFormat: "YYYY-MM-DD",
+        isFirstRun: generalLedgerParams.isFirstRun,
+        from: generalLedgerParams.from,
+        to: generalLedgerParams.to,
+      },
     },
 
     // Correct params
@@ -101,6 +101,8 @@ const GenerateAppFolioReports = () => {
       insertMethod: SnowFlakeInsertingMethod.BulkUpsert,
       params: agedReceivablesParams.params,
       optionalParams: {
+        dateField: "as_of_date",
+        dateFormat: "MM-DD-YYYY",
         isFirstRun: agedReceivablesParams.isFirstRun,
         from: agedReceivablesParams.from,
         to: agedReceivablesParams.to,
@@ -113,6 +115,8 @@ const GenerateAppFolioReports = () => {
       insertMethod: SnowFlakeInsertingMethod.BulkUpsert,
       params: rentRollParams.params,
       optionalParams: {
+        dateField: "as_of_date",
+        dateFormat: "MM-DD-YYYY",
         isFirstRun: rentRollParams.isFirstRun,
         from: rentRollParams.from,
         to: rentRollParams.to,
@@ -158,3 +162,5 @@ const GenerateAppFolioReports = () => {
 };
 
 export default GenerateAppFolioReports;
+
+logger.info(JSON.stringify(GenerateAppFolioReports()));

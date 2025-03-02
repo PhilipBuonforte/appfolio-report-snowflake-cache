@@ -1,17 +1,35 @@
 import { AgedReceivablesParam } from "../types/AgedReceivablesParam";
 import { GeneralLedgerParam } from "../types/GeneralLedgerParam";
 import { RentRollParam } from "../types/RentRollParam";
-import { generateDates, getStartAndEndOfMonth } from "./date";
+import { generateDates, getFormattedDate, getStartAndEndOfMonth } from "./date";
 import { getReportCacheState, saveState } from "./state";
 
-export function generateGeneralLedgerParams(
-  startDate: string,
-  endDate: string,
-  intervalInMonths: number
-): GeneralLedgerParam[] {
-  const paramsList: GeneralLedgerParam[] = [];
-  const start = new Date(startDate);
+export function generateGeneralLedgerParams(): {
+  params: GeneralLedgerParam[];
+  from: string;
+  to: string;
+  isFirstRun: boolean;
+} {
+  const report_name = "general_ledger";
+  let startDate = "01/01/2023";
+  const endDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth() + 1,
+    0
+  ).toLocaleDateString("en-US");
+  const intervalInMonths = 2;
+  const state = getReportCacheState(report_name);
+
+  const params: GeneralLedgerParam[] = [];
+  const start = state.isFirstRun
+    ? new Date(startDate)
+    : new Date(new Date().setMonth(new Date().getMonth() - 3)); // Ensure this returns a Date object
+
   const end = new Date(endDate);
+
+  // Get the "from" and "to" dates
+  const from = state.isFirstRun ? "" : getFormattedDate(start); // First date in the array
+  const to = state.isFirstRun ? "" : getFormattedDate(end); // Last date in the array
 
   let currentStart = new Date(start);
 
@@ -24,7 +42,7 @@ export function generateGeneralLedgerParams(
       currentEnd.setTime(end.getTime());
     }
 
-    paramsList.push({
+    params.push({
       property_visibility: "all",
       project_visibility: "all",
       accounting_basis: "accrual",
@@ -38,7 +56,9 @@ export function generateGeneralLedgerParams(
     currentStart.setDate(currentStart.getDate() + 1); // Avoid overlap
   }
 
-  return paramsList;
+  if (state.isFirstRun) saveState(report_name, { isFirstRun: false });
+
+  return { params, from, to, isFirstRun: state.isFirstRun };
 }
 
 export function generateAgedReceivablesParams(): {
@@ -68,9 +88,8 @@ export function generateAgedReceivablesParams(): {
     saveState(report_name, { isFirstRun: false });
 
     // Get the "from" and "to" dates
-    const from = params.length > 0 ? params[0].occurred_on_to : ""; // First date in the array
-    const to =
-      params.length > 0 ? params[params.length - 1].occurred_on_to : ""; // Last date in the array
+    const from = ""; // First date in the array
+    const to = ""; // Last date in the array
 
     return { params, from, to, isFirstRun: true };
   } else {
@@ -169,8 +188,8 @@ export function generateRentRollParams(): {
     saveState(report_name, { isFirstRun: false });
 
     // Get the "from" and "to" dates
-    const from = params.length > 0 ? params[0].as_of_to : ""; // First date in the array
-    const to = params.length > 0 ? params[params.length - 1].as_of_to : ""; // Last date in the array
+    const from = ""; // First date in the array
+    const to = ""; // Last date in the array
 
     return { params, from, to, isFirstRun: true };
   } else {

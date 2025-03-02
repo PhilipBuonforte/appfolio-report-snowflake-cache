@@ -121,7 +121,8 @@ export async function handleAppFolioData(
 
       await removeExistingRecords(
         stagingTableName,
-        "as_of_date",
+        optionalParams["dateField"] as string,
+        optionalParams["dateFormat"] as string,
         convertToMMDDYYYY(optionalParams.from),
         convertToMMDDYYYY(optionalParams.to)
       );

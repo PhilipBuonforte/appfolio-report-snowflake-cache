@@ -37,3 +37,11 @@ export function convertToMMDDYYYY(date: string): string {
   // Return the date in 'MM-DD-YYYY' format
   return `${formattedMonth}-${formattedDay}-${year}`;
 }
+
+export function getFormattedDate(date: Date): string {
+  // Format to "MM/DD/YYYY"
+  return `${(date.getMonth() + 1).toString().padStart(2, "0")}/${date
+    .getDate()
+    .toString()
+    .padStart(2, "0")}/${date.getFullYear()}`;
+}
