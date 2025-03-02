@@ -17,7 +17,7 @@ export function generateGeneralLedgerParams(): {
     new Date().getMonth() + 1,
     0
   ).toLocaleDateString("en-US");
-  const intervalInMonths = 2;
+  const intervalInMonths = 1;
   const state = getReportCacheState(report_name);
 
   const params: GeneralLedgerParam[] = [];
