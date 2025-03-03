@@ -20,7 +20,7 @@ export function getTimeUntilNext8AM(): number {
  */
 export function isWithinAllowedTime(): boolean {
   const now = DateTime.now().setZone("America/New_York"); // Get current time in EST
-  const startHour = 8; // 8 AM
-  const endHour = 20; // 8 PM
+  const startHour = 7; // 7 AM
+  const endHour = 22; // 22 PM
   return now.hour >= startHour && now.hour < endHour; // Check if the current hour is within the range
 }
