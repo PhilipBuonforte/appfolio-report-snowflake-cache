@@ -114,3 +114,31 @@ export async function renameTable(
     `[INFO] Table '${oldName}' renamed to '${newName}' successfully.`
   );
 }
+
+// Add this function to execute the stored procedure
+// ...existing imports and functions...
+
+/**
+ * Executes the silver_lands master queries stored procedure
+ * @throws Error if the stored procedure execution fails
+ */
+export async function executeSnowflakeProcedure(): Promise<void> {
+  try {
+    logger.info("[INFO] Executing Snowflake stored procedure...");
+
+    await new Promise<void>((resolve, reject) => {
+      connection.execute({
+        sqlText: "CALL silver_lands.silver_lands_data.run_master_queries()",
+        complete: (err) => (err ? reject(err) : resolve()),
+      });
+    });
+
+    logger.info("[INFO] Snowflake stored procedure executed successfully.");
+  } catch (err: any) {
+    logger.error("[ERROR] Failed to execute Snowflake stored procedure:", {
+      error: err.message,
+      stack: err.stack,
+    });
+    throw err;
+  }
+}

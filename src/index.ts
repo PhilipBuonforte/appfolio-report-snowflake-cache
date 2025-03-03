@@ -1,6 +1,8 @@
 import { connectToSnowflake } from "./clients/snowflakeClient";
 import GenerateAppFolioReports from "./const/appfolio";
 import { handleAppFolioData } from "./services/appfolioService";
+import { executeSnowflakeProcedure } from "./services/snowflakeService";
+import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
 import { getTimeUntilNext8AM, isWithinAllowedTime } from "./utils/time";
 
@@ -120,6 +122,14 @@ async function main() {
 
       logger.info("[INFO] Starting a new pipeline iteration...");
       await processAllReports(); // Process all reports sequentially
+
+      logger.info(
+        "[INFO] Execute stored procedure after reports are processed..."
+      );
+      await executeSnowflakeProcedure();
+
+      await refreshTableauExtract();
+
       logger.info(
         `[INFO] Pipeline iteration completed. Waiting ${
           interval / 1000
