@@ -1,127 +1,166 @@
-# Appfolio Snowflake
+# AppFolio to Snowflake Data Pipeline
 
-## Project Description
+## Overview
 
-Appfolio Snowflake is a project designed to integrate Appfolio with Snowflake, providing seamless data transfer and management capabilities. This project aims to simplify data operations and enhance data accessibility for users.
+A TypeScript-based data pipeline that automates data synchronization between AppFolio and Snowflake, with integrated Tableau refresh capabilities.
 
 ## Features
 
-- Data synchronization between Appfolio and Snowflake
-- Automated data transformation and loading
-- Real-time data updates
-- Comprehensive logging and error handling
-- User-friendly interface for configuration and monitoring
-- Scalable architecture to handle large datasets
+- Automated data synchronization between AppFolio and Snowflake
+- Configurable execution window (7 AM - 10 PM EST)
+- Built-in retry mechanism for failed operations
+- REST API for pipeline control
+- Tableau extract refresh automation
+- Comprehensive logging system
+- Batch processing with configurable sizes
+- Support for multiple report types
+
+## Prerequisites
+
+- Node.js (v14 or higher)
+- TypeScript
+- AppFolio API credentials
+- Snowflake account
+- Tableau Server access
 
 ## Installation
 
-To install the project, follow these steps:
-
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/appfolio-snowflake.git
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd appfolio-snowflake
-   ```
-3. Install the dependencies:
-   ```bash
-   npm install
-   ```
 
-## Configuration
+```bash
+git clone <repository-url>
+cd appfolio-snowflake
+```
 
-Update the configuration file located at `config/config.json` with your Appfolio and Snowflake credentials. Ensure that you have the necessary permissions and access rights to both platforms.
+2. Install dependencies:
 
-### Environment Variables
+```bash
+npm install
+```
 
-Create a `.env` file in the root directory and add the following environment variables:
+3. Create `.env` file:
 
 ```plaintext
-APPFOLIO_CLIENT_ID=your_appfolio_client_id
-APPFOLIO_CLIENT_SECRET=your_appfolio_client_secret
-APPFOLIO_API_KEY=your_appfolio_api_key
-SNOWFLAKE_ACCOUNT=your_snowflake_account
-SNOWFLAKE_USER=your_snowflake_user
-SNOWFLAKE_PASSWORD=your_snowflake_password
-SNOWFLAKE_DATABASE=your_snowflake_database
-SNOWFLAKE_SCHEMA=your_snowflake_schema
-SNOWFLAKE_WAREHOUSE=your_snowflake_warehouse
+# AppFolio Configuration
+APPFOLIO_CLIENT_ID=your_client_id
+APPFOLIO_CLIENT_SECRET=your_client_secret
+APPFOLIO_API_KEY=your_api_key
+
+# Snowflake Configuration
+SNOWFLAKE_ACCOUNT=your_account
+SNOWFLAKE_USER=your_username
+SNOWFLAKE_PASSWORD=your_password
+SNOWFLAKE_DATABASE=your_database
+SNOWFLAKE_SCHEMA=your_schema
+SNOWFLAKE_WAREHOUSE=your_warehouse
+
+# Tableau Configuration
+TABLEAU_SERVER=your_tableau_server
+TABLEAU_SITE_ID=your_tableau_site_id
+TABLEAU_WORKBOOK_ID=your_tableau_workbook_id
+TABLEAU_PAT_NAME=your_pat_name
+TABLEAU_PAT_SECRET=your_pat_secret
+
+# API Configuration
+PORT=3000
+```
+
+## Project Structure
+
+```plaintext
+src/
+├── api/
+│   ├── controllers/
+│   ├── routes/
+│   └── index.ts
+├── clients/
+│   ├── appfolioClient.ts
+│   └── snowflakeClient.ts
+├── config/
+├── const/
+├── services/
+├── types/
+├── utils/
+└── index.ts
 ```
 
 ## Usage
 
-To start the project, run the following command:
-
-```bash
-npm start
-```
-
-## Running the Project
-
-To run the project, use the following command:
-
-```bash
-npm run dev
-```
-
-## Building the Project
-
-To build the project, use the following command:
+1. Build the project:
 
 ```bash
 npm run build
 ```
 
-## How It Works
+2. Start in production mode:
 
-The Appfolio Snowflake project works by leveraging the Appfolio API to extract data and load it into Snowflake. The process involves the following steps:
-
-1. **Data Extraction**: The project connects to the Appfolio API using the provided API key and retrieves the necessary data.
-2. **Data Transformation**: The extracted data is transformed into a format suitable for loading into Snowflake. This may involve data cleaning, normalization, and other transformation operations.
-3. **Data Loading**: The transformed data is loaded into Snowflake using the provided Snowflake credentials. The data is stored in the specified database, schema, and warehouse.
-4. **Real-time Updates**: The project supports real-time data updates, ensuring that the data in Snowflake is always up-to-date with the latest information from Appfolio.
-5. **Logging and Error Handling**: Comprehensive logging and error handling mechanisms are in place to ensure smooth operation and easy troubleshooting.
-
-## Configurable Components
-
-The project includes several configurable components that can be customized to suit your needs:
-
-1. **Appfolio API Configuration**: The `config/config.json` file contains the configuration for connecting to the Appfolio API. You can update this file with your Appfolio API key and other relevant settings.
-2. **Snowflake Configuration**: The `.env` file contains environment variables for connecting to Snowflake. You can update this file with your Snowflake account details, user credentials, database, schema, and warehouse information.
-3. **Data Transformation Rules**: The data transformation rules can be customized in the `src/services` directory. You can modify the existing transformation logic or add new rules to meet your specific requirements.
-4. **Logging Configuration**: The logging configuration can be adjusted in the `src/config` directory. You can customize the logging level, format, and destination to suit your needs.
-5. **Error Handling**: The error handling mechanisms can be customized in the `src/controllers` directory. You can modify the existing error handling logic or add new handlers to address specific error scenarios.
-
-## Project Structure
-
-The project structure is as follows:
-
-```plaintext
-appfolio-snowflake/
-├── config/
-│   └── config.json
-├── src/
-│   ├── index.js
-│   ├── services/
-│   ├── controllers/
-│   └── models/
-├── .env
-├── package.json
-└── README.md
+```bash
+npm start
 ```
 
-## Contributing
+3. Development mode:
 
-We welcome contributions! Please follow these steps to contribute:
+```bash
+npm run dev
+```
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Commit your changes (`git commit -m 'Add some feature'`)
-4. Push to the branch (`git push origin feature-branch`)
-5. Create a new Pull Request
+## API Endpoints
+
+### Reset General Ledger State
+
+```bash
+curl -X POST -H "Content-Type: application/json" http://localhost:3000/api/reset-general-ledger
+```
+
+## Pipeline Schedule
+
+- Runs every hour between 7 AM and 10 PM EST
+- Automatically pauses outside operating hours
+- Resumes at 7 AM the next day
+
+## Error Handling
+
+- Built-in retry mechanism (3 attempts)
+- Comprehensive logging to `logs/` directory
+- Failed operations don't stop the entire pipeline
+- Error notifications via logging system
+
+## Development
+
+1. Start development servers:
+
+```bash
+npm run dev
+```
+
+2. Build for production:
+
+```bash
+npm run build
+```
+
+3. Start production servers:
+
+```bash
+npm start
+```
+
+## Scripts
+
+- `npm start` - Run production build
+- `npm run dev` - Run development mode
+- `npm run build` - Build TypeScript files
+- `npm run start:api` - Run API server only
+- `npm run start:pipeline` - Run pipeline only
+
+## Logging
+
+Logs are written to:
+
+- `logs/error.log` - Error events
+- `logs/combined.log` - All events
+- Console output in development mode
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+ISC
