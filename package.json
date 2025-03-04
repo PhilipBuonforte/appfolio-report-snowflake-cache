@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "dev": "npx ts-node src/index.ts",
+    "start:api": "node dist/server.js",
+    "start:pipeline": "node dist/index.js",
+    "start": "concurrently \"npm run start:api\" \"npm run start:pipeline\"",
+    "dev:api": "nodemon src/server.ts",
+    "dev:pipeline": "nodemon src/index.ts",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:pipeline\"",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,9 +17,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "luxon": "^3.5.0",
     "snowflake-sdk": "^2.0.2",
     "ts-node": "^10.9.2",
@@ -24,6 +30,7 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "@types/luxon": "^3.4.2"
+    "@types/luxon": "^3.4.2",
+    "concurrently": "^9.1.2"
   }
 }

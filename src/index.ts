@@ -4,7 +4,7 @@ import { handleAppFolioData } from "./services/appfolioService";
 import { executeSnowflakeProcedure } from "./services/snowflakeService";
 import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
-import { getTimeUntilNext8AM, isWithinAllowedTime } from "./utils/time";
+import { getTimeUntilNext7AM, isWithinAllowedTime } from "./utils/time";
 
 const AppFolioReports = GenerateAppFolioReports();
 
@@ -110,7 +110,7 @@ async function main() {
     while (true) {
       // Check if the current time is within the allowed window
       if (!isWithinAllowedTime()) {
-        const timeUntilNext8AM = getTimeUntilNext8AM();
+        const timeUntilNext8AM = getTimeUntilNext7AM();
         logger.info(
           `[INFO] Current time is outside the allowed window (8 AM - 8 PM EST). Waiting ${
             timeUntilNext8AM / 1000 / 60
