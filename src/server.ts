@@ -1,23 +1,15 @@
 import express from "express";
-import { saveState } from "./utils/state";
+import router from "./api/router";
 import logger from "./utils/logger";
 
-const router = express.Router();
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-router.post("/reset-general-ledger", async (req, res) => {
-  try {
-    await saveState("general_ledger", { isFirstRun: true });
-    logger.info("[INFO] General ledger state reset successfully");
-    res
-      .status(200)
-      .json({ message: "General ledger state reset successfully" });
-  } catch (error: any) {
-    logger.error("[ERROR] Failed to reset general ledger state:", {
-      error: error.message,
-      stack: error.stack,
-    });
-    res.status(500).json({ error: "Failed to reset general ledger state" });
-  }
+app.use(express.json());
+app.use("/api", router);
+
+app.listen(PORT, () => {
+  logger.info(`[INFO] API Server running on port ${PORT}`);
 });
 
-export default router;
+export default app;
