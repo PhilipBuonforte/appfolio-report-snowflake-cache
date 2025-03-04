@@ -6,7 +6,7 @@ import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
 import { getTimeUntilNext7AM, isWithinAllowedTime } from "./utils/time";
 
-const AppFolioReports = GenerateAppFolioReports();
+let AppFolioReports = GenerateAppFolioReports();
 
 type AppFolioReportKey = keyof typeof AppFolioReports;
 
@@ -72,6 +72,8 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
  * Process all reports sequentially
  */
 async function processAllReports() {
+  AppFolioReports = GenerateAppFolioReports();
+
   logger.info("[INFO] Starting the AppFolio data pipeline...");
 
   // Connect to Snowflake
