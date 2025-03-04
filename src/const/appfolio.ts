@@ -162,5 +162,3 @@ const GenerateAppFolioReports = () => {
 };
 
 export default GenerateAppFolioReports;
-
-logger.info(JSON.stringify(GenerateAppFolioReports()));
