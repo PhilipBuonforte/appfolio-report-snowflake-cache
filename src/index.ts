@@ -4,7 +4,11 @@ import { handleAppFolioData } from "./services/appfolioService";
 import { executeSnowflakeProcedure } from "./services/snowflakeService";
 import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
-import { getTimeUntilNext7AM, isWithinAllowedTime } from "./utils/time";
+import {
+  getNextHourMark,
+  getTimeUntilNext7AM,
+  isWithinAllowedTime,
+} from "./utils/time";
 
 let AppFolioReports = GenerateAppFolioReports();
 
@@ -110,6 +114,9 @@ async function main() {
 
   try {
     while (true) {
+      const startTime = new Date();
+      const nextHourMark = getNextHourMark();
+
       // Check if the current time is within the allowed window
       if (!isWithinAllowedTime()) {
         const timeUntilNext7AM = getTimeUntilNext7AM();
@@ -132,14 +139,30 @@ async function main() {
 
       await refreshTableauExtract();
 
-      logger.info(
-        `[INFO] Pipeline iteration completed. Waiting ${
-          interval / 1000
-        } seconds before next run...`
+      // Calculate time until next hour mark
+      const endTime = new Date();
+      const executionTime = endTime.getTime() - startTime.getTime();
+      const timeUntilNextHour = Math.max(
+        0,
+        nextHourMark.getTime() - endTime.getTime()
       );
 
-      // Wait for the specified interval before the next iteration
-      await new Promise((resolve) => setTimeout(resolve, interval));
+      logger.info(
+        `[INFO] Pipeline completed in ${Math.round(
+          executionTime / 1000 / 60
+        )} minutes. ` +
+          `${
+            timeUntilNextHour > 0
+              ? `Waiting ${Math.round(
+                  timeUntilNextHour / 1000 / 60
+                )} minutes until next hour.`
+              : "Starting next iteration immediately."
+          }`
+      );
+
+      if (timeUntilNextHour > 0) {
+        await new Promise((resolve) => setTimeout(resolve, timeUntilNextHour));
+      }
     }
   } catch (err) {
     logger.error("[CRITICAL] Unhandled exception in the pipeline.", {

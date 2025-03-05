@@ -24,3 +24,15 @@ export function isWithinAllowedTime(): boolean {
   const endHour = 22; // 22 PM
   return now.hour >= startHour && now.hour < endHour; // Check if the current hour is within the range
 }
+
+/**
+ * Returns the date and time of the next hour mark (0 minutes, 0 seconds, 0 milliseconds).
+ *
+ * @returns The date and time of the next hour mark in the local time zone.
+ */
+export function getNextHourMark(): Date {
+  const now = new Date();
+  const nextHour = new Date(now);
+  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+  return nextHour;
+}
