@@ -17,6 +17,10 @@ const connection = snowflake.createConnection({
  * Logs the connection status using Winston.
  */
 export function connectToSnowflake(): Promise<void> {
+  if (connection.isUp()) {
+    logger.info("[INFO] Connection to Snowflake established.");
+    return Promise.resolve();
+  }
   return new Promise((resolve, reject) => {
     connection.connect((err, conn) => {
       if (err) {
