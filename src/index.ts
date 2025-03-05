@@ -112,13 +112,13 @@ async function main() {
     while (true) {
       // Check if the current time is within the allowed window
       if (!isWithinAllowedTime()) {
-        const timeUntilNext8AM = getTimeUntilNext7AM();
+        const timeUntilNext7AM = getTimeUntilNext7AM();
         logger.info(
-          `[INFO] Current time is outside the allowed window (8 AM - 8 PM EST). Waiting ${
-            timeUntilNext8AM / 1000 / 60
-          } minutes until 8 AM...`
+          `[INFO] Current time is outside the allowed window (7 AM - 10 PM EST). Waiting ${
+            timeUntilNext7AM / 1000 / 60
+          } minutes until 7 AM...`
         );
-        await new Promise((resolve) => setTimeout(resolve, timeUntilNext8AM)); // Wait until 8 AM
+        await new Promise((resolve) => setTimeout(resolve, timeUntilNext7AM)); // Wait until 7 AM
         continue;
       }
 
