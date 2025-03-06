@@ -17,16 +17,28 @@ const connection = snowflake.createConnection({
  * Logs the connection status using Winston.
  */
 export function connectToSnowflake(): Promise<void> {
-  if (connection.isUp()) {
-    logger.info("[INFO] Connection to Snowflake established.");
-    return Promise.resolve();
-  }
   return new Promise((resolve, reject) => {
     connection.connect((err, conn) => {
       if (err) {
         logger.error(`[ERROR] Failed to connect to Snowflake: ${err.message}`);
         reject(err);
       } else {
+        resolve();
+      }
+    });
+  });
+}
+
+export function disconnectFromSnowflake(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    connection.destroy((err) => {
+      if (err) {
+        logger.error(
+          `[ERROR] Failed to disconnect from Snowflake: ${err.message}`
+        );
+        reject(err);
+      } else {
+        logger.info("[INFO] Connection to Snowflake closed.");
         resolve();
       }
     });

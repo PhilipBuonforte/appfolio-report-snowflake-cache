@@ -1,4 +1,7 @@
-import { connectToSnowflake } from "./clients/snowflakeClient";
+import {
+  connectToSnowflake,
+  disconnectFromSnowflake,
+} from "./clients/snowflakeClient";
 import GenerateAppFolioReports from "./const/appfolio";
 import { handleAppFolioData } from "./services/appfolioService";
 import { executeSnowflakeProcedure } from "./services/snowflakeService";
@@ -80,11 +83,6 @@ async function processAllReports() {
 
   logger.info("[INFO] Starting the AppFolio data pipeline...");
 
-  // Connect to Snowflake
-  logger.info("[INFO] Connecting to Snowflake...");
-  await connectToSnowflake();
-  logger.info("[INFO] Successfully connected to Snowflake.");
-
   // Process each report in sequence
   const reportKeys = Object.keys(AppFolioReports) as Array<AppFolioReportKey>;
 
@@ -129,6 +127,11 @@ async function main() {
         continue;
       }
 
+      // Connect to Snowflake
+      logger.info("[INFO] Connecting to Snowflake...");
+      await connectToSnowflake();
+      logger.info("[INFO] Successfully connected to Snowflake.");
+
       logger.info("[INFO] Starting a new pipeline iteration...");
       await processAllReports(); // Process all reports sequentially
 
@@ -159,6 +162,11 @@ async function main() {
               : "Starting next iteration immediately."
           }`
       );
+
+      // Disconnecting from Snowflake
+      logger.info("[INFO] Disconnecting from Snowflake...");
+      await disconnectFromSnowflake();
+      logger.info("[INFO] Successfully disconnected from Snowflake.");
 
       if (timeUntilNextHour > 0) {
         await new Promise((resolve) => setTimeout(resolve, timeUntilNextHour));
