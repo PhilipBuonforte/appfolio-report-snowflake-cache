@@ -1,5 +1,5 @@
 import { Bind } from "snowflake-sdk";
-import { connection } from "../clients/snowflakeClient";
+import { connection, ensureConnection } from "../clients/snowflakeClient";
 import logger from "../utils/logger"; // Import Winston logger
 
 /**
@@ -17,6 +17,7 @@ export async function insertDataToSnowflake(
     logger.info("[INFO] No data to insert.");
     return;
   }
+  const conn = ensureConnection();
 
   // Dynamically build the SQL query
   const keys = Object.keys(data[0]); // Get column names from the first object
@@ -35,7 +36,7 @@ export async function insertDataToSnowflake(
 
     // Ensure the table exists
     await new Promise<void>((resolve, reject) => {
-      connection.execute({
+      conn.execute({
         sqlText: createTableSQL,
         complete: (err) => {
           if (err) {
@@ -75,7 +76,7 @@ export async function insertDataToSnowflake(
       logger.debug(`[DEBUG] Binds: ${JSON.stringify(binds.slice(0, 10))}...`);
 
       await new Promise<void>((resolve, reject) => {
-        connection.execute({
+        conn.execute({
           sqlText: insertSQL,
           binds,
           complete: (err) => {
