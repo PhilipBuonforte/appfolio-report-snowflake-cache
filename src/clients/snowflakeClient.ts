@@ -1,49 +1,69 @@
 import snowflake from "snowflake-sdk";
 import { SnowflakeConfig } from "../config/snowflake";
-import logger from "../utils/logger"; // Import the Winston logger
+import logger from "../utils/logger";
 
-const connection = snowflake.createConnection({
-  account: SnowflakeConfig.account,
-  username: SnowflakeConfig.username,
-  password: SnowflakeConfig.password,
-  database: SnowflakeConfig.database,
-  schema: SnowflakeConfig.schema,
-  warehouse: SnowflakeConfig.warehouse,
-  role: SnowflakeConfig.role,
-});
+let connection: snowflake.Connection | null = null;
 
 /**
- * Establish a connection to Snowflake using Promises for asynchronous handling.
- * Logs the connection status using Winston.
+ * Establish a new Snowflake connection.
  */
-export function connectToSnowflake(): Promise<void> {
+export async function connectToSnowflake(): Promise<void> {
+  if (connection) {
+    logger.warn(
+      "[WARN] Existing Snowflake connection found. Destroying and reconnecting."
+    );
+    await disconnectFromSnowflake(); // Ensure previous connection is closed properly
+  }
+
+  connection = snowflake.createConnection({
+    account: SnowflakeConfig.account,
+    username: SnowflakeConfig.username,
+    password: SnowflakeConfig.password,
+    database: SnowflakeConfig.database,
+    schema: SnowflakeConfig.schema,
+    warehouse: SnowflakeConfig.warehouse,
+    role: SnowflakeConfig.role,
+  });
+
   return new Promise((resolve, reject) => {
-    connection.connect((err, conn) => {
+    connection!.connect((err, conn) => {
       if (err) {
-        logger.error(`[ERROR] Failed to connect to Snowflake: ${err.message}`);
-        reject(err);
-      } else {
-        resolve();
+        logger.error(`[ERROR] Failed to connect to Snowflake: ${err.message}`, {
+          error: err,
+        });
+        connection = null;
+        return reject(err);
       }
+      logger.info("[INFO] Successfully connected to Snowflake.");
+      resolve();
     });
   });
 }
 
-export function disconnectFromSnowflake(): Promise<void> {
+/**
+ * Close the active Snowflake connection.
+ */
+export async function disconnectFromSnowflake(): Promise<void> {
+  if (!connection) {
+    logger.warn("[WARN] No active Snowflake connection to disconnect.");
+    return Promise.resolve();
+  }
+
   return new Promise((resolve, reject) => {
-    connection.destroy((err) => {
+    connection!.destroy((err) => {
       if (err) {
         logger.error(
-          `[ERROR] Failed to disconnect from Snowflake: ${err.message}`
+          `[ERROR] Failed to disconnect from Snowflake: ${err.message}`,
+          { error: err }
         );
-        reject(err);
-      } else {
-        logger.info("[INFO] Connection to Snowflake closed.");
-        resolve();
+        return reject(err);
       }
+      logger.info("[INFO] Connection to Snowflake closed.");
+      connection = null; // Reset connection reference
+      resolve();
     });
   });
 }
 
-// Export the Snowflake connection object
+// Export the connection for use
 export { connection };
