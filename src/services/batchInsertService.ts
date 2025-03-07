@@ -1,4 +1,4 @@
-import { connection } from "../clients/snowflakeClient";
+import { connection, ensureConnection } from "../clients/snowflakeClient";
 import { Bind } from "snowflake-sdk";
 import logger from "../utils/logger"; // Import Winston logger
 
@@ -18,6 +18,7 @@ export async function batchInsert(
     return;
   }
 
+  const conn = ensureConnection();
   const keys = Object.keys(data[0]); // Extract column names from the first row
   const placeholders = `(${keys.map(() => "?").join(", ")})`; // Placeholder for SQL values
   const createTableSQL = `
@@ -31,7 +32,7 @@ export async function batchInsert(
     logger.info(`[INFO] Ensuring table '${tableName}' exists.`);
     logger.debug(`[DEBUG] Executing SQL: ${createTableSQL}`);
     await new Promise<void>((resolve, reject) => {
-      connection.execute({
+      conn.execute({
         sqlText: createTableSQL,
         complete: (err) => (err ? reject(err) : resolve()),
       });
@@ -58,7 +59,7 @@ export async function batchInsert(
       logger.debug(`[DEBUG] Binds: ${JSON.stringify(binds.slice(0, 10))}...`);
 
       await new Promise<void>((resolve, reject) => {
-        connection.execute({
+        conn.execute({
           sqlText: insertSQL,
           binds,
           complete: (err) => (err ? reject(err) : resolve()),

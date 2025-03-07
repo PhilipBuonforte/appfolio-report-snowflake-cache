@@ -1,4 +1,4 @@
-import { connection } from "../clients/snowflakeClient";
+import { connection, ensureConnection } from "../clients/snowflakeClient";
 import logger from "../utils/logger";
 
 /**
@@ -27,11 +27,13 @@ export async function ensureTableExists(
   tableName: string,
   columns: string[]
 ): Promise<void> {
+  const conn = ensureConnection();
+
   const createTableSQL = generateCreateTableSQL(tableName, columns);
   logger.debug(`[DEBUG] Executing SQL: ${createTableSQL}`);
 
   await new Promise<void>((resolve, reject) => {
-    connection.execute({
+    conn.execute({
       sqlText: createTableSQL,
       complete: (err) => (err ? reject(err) : resolve()),
     });
@@ -45,12 +47,14 @@ export async function ensureTableExists(
  * @param tableName Name of the table to drop.
  */
 export async function dropTable(tableName: string): Promise<void> {
+  const conn = ensureConnection();
+
   const dropTableSQL = `DROP TABLE IF EXISTS ${tableName};`;
   logger.info(`[INFO] Dropping table '${tableName}' if it exists...`);
   logger.debug(`[DEBUG] Executing SQL: ${dropTableSQL}`);
 
   await new Promise<void>((resolve, reject) => {
-    connection.execute({
+    conn.execute({
       sqlText: dropTableSQL,
       complete: (err) => (err ? reject(err) : resolve()),
     });
@@ -70,6 +74,7 @@ export async function duplicateTable(
   originalTableName: string,
   newTableName: string
 ): Promise<void> {
+  const conn = ensureConnection();
   // SQL to duplicate the table
   const duplicateTableSQL = `CREATE TABLE ${newTableName} AS SELECT * FROM ${originalTableName};`;
 
@@ -79,7 +84,7 @@ export async function duplicateTable(
   logger.debug(`[DEBUG] Executing SQL: ${duplicateTableSQL}`);
 
   await new Promise<void>((resolve, reject) => {
-    connection.execute({
+    conn.execute({
       sqlText: duplicateTableSQL,
       complete: (err) => (err ? reject(err) : resolve()),
     });
@@ -99,12 +104,13 @@ export async function renameTable(
   oldName: string,
   newName: string
 ): Promise<void> {
+  const conn = ensureConnection();
   const renameTableSQL = `ALTER TABLE ${oldName} RENAME TO ${newName};`;
   logger.info(`[INFO] Renaming table '${oldName}' to '${newName}'...`);
   logger.debug(`[DEBUG] Executing SQL: ${renameTableSQL}`);
 
   await new Promise<void>((resolve, reject) => {
-    connection.execute({
+    conn.execute({
       sqlText: renameTableSQL,
       complete: (err) => (err ? reject(err) : resolve()),
     });
@@ -124,10 +130,11 @@ export async function renameTable(
  */
 export async function executeSnowflakeProcedure(): Promise<void> {
   try {
+    const conn = ensureConnection();
     logger.info("[INFO] Executing Snowflake stored procedure...");
 
     await new Promise<void>((resolve, reject) => {
-      connection.execute({
+      conn.execute({
         sqlText: "CALL silver_lands.silver_lands_data.run_master_queries()",
         complete: (err) => (err ? reject(err) : resolve()),
       });

@@ -65,5 +65,18 @@ export async function disconnectFromSnowflake(): Promise<void> {
   });
 }
 
+/**
+ * Ensures there is an active Snowflake connection
+ * @throws Error if connection is null
+ */
+export function ensureConnection() {
+  if (!connection) {
+    const error = new Error("Snowflake connection is not initialized");
+    logger.error("[ERROR] Snowflake connection error:", { error });
+    throw error;
+  }
+  return connection;
+}
+
 // Export the connection for use
 export { connection };

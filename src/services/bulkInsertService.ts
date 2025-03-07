@@ -1,4 +1,4 @@
-import { connection } from "../clients/snowflakeClient";
+import { connection, ensureConnection } from "../clients/snowflakeClient";
 import fs from "fs";
 import path from "path";
 import logger from "../utils/logger"; // Import Winston logger
@@ -69,10 +69,11 @@ async function executeSnowflakeQuery(
   sqlText: string,
   description: string
 ): Promise<void> {
+  const conn = ensureConnection();
   logger.info(`[INFO] ${description}...`);
   logger.debug(`[DEBUG] Executing SQL: ${sqlText}`);
   await new Promise<void>((resolve, reject) => {
-    connection.execute({
+    conn.execute({
       sqlText,
       complete: (err, stmt, rows) => {
         if (err) {
