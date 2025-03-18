@@ -33,6 +33,6 @@ export function isWithinAllowedTime(): boolean {
 export function getNextHourMark(): Date {
   const now = new Date();
   const nextHour = new Date(now);
-  nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+  nextHour.setHours(nextHour.getHours() + 1);
   return nextHour;
 }
