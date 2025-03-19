@@ -56,8 +56,6 @@ export function generateGeneralLedgerParams(): {
     currentStart.setDate(currentStart.getDate() + 1); // Avoid overlap
   }
 
-  if (state.isFirstRun) saveState(report_name, { isFirstRun: false });
-
   return { params, from, to, isFirstRun: state.isFirstRun };
 }
 

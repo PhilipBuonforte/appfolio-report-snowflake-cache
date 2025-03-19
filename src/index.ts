@@ -7,6 +7,7 @@ import { handleAppFolioData } from "./services/appfolioService";
 import { executeSnowflakeProcedure } from "./services/snowflakeService";
 import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
+import { saveState } from "./utils/state";
 import {
   getNextHourMark,
   getTimeUntilNext7AM,
@@ -94,6 +95,7 @@ async function processAllReports() {
 
     try {
       await processReport(reportKey); // Process each report with retry logic
+      saveState(reportKey, { isFirstRun: false });
     } catch (err) {
       logger.error(
         `[CRITICAL] Failed to process report ${reportKey}. Moving to the next report.`
