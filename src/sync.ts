@@ -7,20 +7,15 @@ import { handleAppFolioData } from "./services/appfolioService";
 import { executeSnowflakeProcedure } from "./services/snowflakeService";
 import { refreshTableauExtract } from "./services/tableauService";
 import logger from "./utils/logger"; // Import Winston logger
-import {
-  getNextHourMark,
-  getTimeUntilNext7AM,
-  isWithinAllowedTime,
-} from "./utils/time";
-
-let AppFolioReports = GenerateAppFolioReports();
-
-type AppFolioReportKey = keyof typeof AppFolioReports;
 
 /**
  * Process a single report with retry logic
  */
-async function processReport(reportKey: AppFolioReportKey, retries = 3) {
+async function processReport(
+  AppFolioReports: any,
+  reportKey: string,
+  retries = 3
+) {
   const report = AppFolioReports[reportKey];
 
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -79,12 +74,12 @@ async function processReport(reportKey: AppFolioReportKey, retries = 3) {
  * Process all reports sequentially
  */
 async function processAllReports() {
-  AppFolioReports = GenerateAppFolioReports();
+  let AppFolioReports = GenerateAppFolioReports();
 
   logger.info("[INFO] Starting the AppFolio data pipeline...");
 
   // Process each report in sequence
-  const reportKeys = Object.keys(AppFolioReports) as Array<AppFolioReportKey>;
+  const reportKeys = Object.keys(AppFolioReports) as Array<string>;
 
   for (let i = 0; i < reportKeys.length; i++) {
     const reportKey = reportKeys[i];
@@ -93,7 +88,7 @@ async function processAllReports() {
     );
 
     try {
-      await processReport(reportKey); // Process each report with retry logic
+      await processReport(AppFolioReports, reportKey); // Process each report with retry logic
     } catch (err) {
       logger.error(
         `[CRITICAL] Failed to process report ${reportKey}. Moving to the next report.`
