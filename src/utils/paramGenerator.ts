@@ -19,7 +19,7 @@ export function generateGeneralLedgerParams(): {
   ).toLocaleDateString("en-US");
   const intervalInMonths = 1;
   const state = getReportCacheState(report_name);
-
+  console.log(state.isFirstRun);
   const params: GeneralLedgerParam[] = [];
   const start = state.isFirstRun
     ? new Date(startDate)
